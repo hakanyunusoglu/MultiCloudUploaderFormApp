@@ -1,7 +1,4 @@
-﻿using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
-using CsvHelper;
+﻿using CsvHelper;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,7 +14,7 @@ using System.Windows.Forms;
 
 namespace TransferMediaCsvToS3App
 {
-    public partial class CsvToS3Uploader : Form
+    public partial class MultiCloudUploaderForm : Form
     {
         private CancellationTokenSource _cancellationTokenSource;
         private string selectedCsvFilePath;
@@ -33,9 +30,18 @@ namespace TransferMediaCsvToS3App
 
         private StorageProvider currentProvider = StorageProvider.AwsS3;
 
-        public CsvToS3Uploader()
+        public MultiCloudUploaderForm()
         {
             InitializeComponent();
+
+            if (currentProvider == StorageProvider.AwsS3)
+            {
+                rbAwsS3.Checked = true;
+            }
+            else
+            {
+                rbAzureBlob.Checked = true;
+            }
 
             this.StartPosition = FormStartPosition.CenterScreen;
             Rectangle workingArea = Screen.GetWorkingArea(this);
@@ -104,6 +110,24 @@ namespace TransferMediaCsvToS3App
             btnAzureVisibleKey.Text = isAzureKeysVisible ? "🔒" : "👁️";
         }
 
+        private void rbAwsS3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbAwsS3.Checked)
+            {
+                currentProvider = StorageProvider.AwsS3;
+                tabControl.SelectedTab = tabPageAWS;
+            }
+        }
+
+        private void rbAzureBlob_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbAzureBlob.Checked)
+            {
+                currentProvider = StorageProvider.AzureBlob;
+                tabControl.SelectedTab = tabPageAzure;
+            }
+        }
+
         private void btnViewFileData_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(selectedCsvFilePath))
@@ -161,33 +185,34 @@ namespace TransferMediaCsvToS3App
                 return;
             }
 
-            if (!IsValidAWSRegion(region))
+            var awsService = new AwsS3StorageService(accessKey, secretKey, region, bucketName);
+
+            if (!awsService.IsValidRegion(region))
             {
                 MessageBox.Show($"Invalid AWS region: {region}. Please enter a valid region!", "Region Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.GetBySystemName(region));
-
-            if (!await ValidateS3Client(s3Client, bucketName))
+            if (!await awsService.ValidateConnectionAsync())
             {
+                MessageBox.Show("Failed to connect to AWS S3 with the entered information. Please check your information!", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             await ProcessCsvAndUpload(csvPath, async (record, fileStream, fileName) =>
             {
-                bool exists = await CheckIfFileExists(s3Client, bucketName, fileName, record.RowNumber);
+                bool exists = await awsService.CheckIfFileExistsAsync(fileName);
 
                 if (!exists)
                 {
-                    await UploadToS3(s3Client, bucketName, fileName, fileStream, record.RowNumber);
+                    await awsService.UploadFileAsync(fileName, fileStream, _cancellationTokenSource.Token);
                     Log(record.RowNumber, $"Uploaded: {fileName}");
                 }
                 else
                 {
                     Log(record.RowNumber, $"Skipped (Exists): {fileName}");
                 }
-            });
+            }, chkAwsOnlyLatestMedia.Checked);
         }
 
         private async Task TransferToAzureBlob()
@@ -195,6 +220,12 @@ namespace TransferMediaCsvToS3App
             string csvPath = txtCsvPath.Text;
             string connectionString = txtAzureConnectionString.Text;
             string containerName = txtAzureContainerName.Text;
+            string folderPath = txtAzureFolderPath.Text;
+
+            if (!string.IsNullOrEmpty(folderPath) && !folderPath.EndsWith("/"))
+            {
+                folderPath += "/";
+            }
 
             if (string.IsNullOrEmpty(csvPath) || string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(containerName))
             {
@@ -202,9 +233,9 @@ namespace TransferMediaCsvToS3App
                 return;
             }
 
-            var azureService = new AzureBlobStorageService(connectionString, containerName);
+            var azureService = new AzureBlobStorageService(connectionString, containerName, folderPath);
 
-            if (!await ValidateAzureConnection(azureService))
+            if (!await azureService.ValidateConnectionAsync())
             {
                 return;
             }
@@ -222,10 +253,10 @@ namespace TransferMediaCsvToS3App
                 {
                     Log(record.RowNumber, $"Skipped (Exists): {fileName}");
                 }
-            });
+            }, chkAwsOnlyLatestMedia.Checked);
         }
 
-        private async Task ProcessCsvAndUpload(string csvPath, Func<CsvRecordModel, Stream, string, Task> uploadAction)
+        private async Task ProcessCsvAndUpload(string csvPath, Func<CsvRecordModel, Stream, string, Task> uploadAction, bool onlyLatestRecords = false)
         {
             using (var stream = new FileStream(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = new StreamReader(stream))
@@ -245,6 +276,15 @@ namespace TransferMediaCsvToS3App
 
                 var records = csv.GetRecords<dynamic>();
                 var processedRecords = CsvProcessor.ProcessCsvRecords(records);
+
+                if (onlyLatestRecords)
+                {
+                    processedRecords = processedRecords.GetLatestRecords();
+                }
+
+                Log(0, onlyLatestRecords ?
+        "Processing mode: Only uploading latest media files for each product and direction." :
+        "Processing mode: Uploading all media files.");
 
                 foreach (var record in processedRecords)
                 {
@@ -283,29 +323,6 @@ namespace TransferMediaCsvToS3App
             }
         }
 
-        private async Task<bool> ValidateAzureConnection(AzureBlobStorageService azureService)
-        {
-            try
-            {
-                bool isValid = await azureService.ValidateConnectionAsync();
-                if (!isValid)
-                {
-                    MessageBox.Show("Failed to connect to Azure Blob Storage with the entered information. Please check your information!", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                return isValid;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error validating Azure connection: {ex.Message}", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-
-        private bool IsValidAWSRegion(string regionName)
-        {
-            return RegionEndpoint.EnumerableAllRegions.Any(region => region.SystemName.Equals(regionName, StringComparison.OrdinalIgnoreCase));
-        }
-
         private string CleanString(string input)
         {
             if (string.IsNullOrEmpty(input))
@@ -314,31 +331,6 @@ namespace TransferMediaCsvToS3App
             return Regex.Replace(input, @"[^a-zA-Z0-9]", "");
         }
 
-        private async Task<bool> ValidateS3Client(AmazonS3Client s3Client, string bucketName)
-        {
-            try
-            {
-                var response = await s3Client.ListBucketsAsync();
-                if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    MessageBox.Show("Failed to connect to AWS S3 with the entered information. Please check your information!", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-
-                if (!response.Buckets.Any(b => b.BucketName == bucketName))
-                {
-                    MessageBox.Show($"The bucket '{bucketName}' does not exist in AWS S3!", "Bucket Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Failed to connect to AWS S3 with the entered information. Please check your information!", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
 
         private async Task<Stream> DownloadFile(int rowNumber, string url)
         {
@@ -360,45 +352,6 @@ namespace TransferMediaCsvToS3App
             {
                 Log(rowNumber, $"Error downloading {url}: {ex.Message}");
                 return null;
-            }
-        }
-
-        private async Task<bool> CheckIfFileExists(AmazonS3Client s3Client, string bucketName, string fileName, int rowNumber)
-        {
-            try
-            {
-                var request = new ListObjectsV2Request
-                {
-                    BucketName = bucketName,
-                    Prefix = fileName
-                };
-
-                var response = await s3Client.ListObjectsV2Async(request);
-                return response.S3Objects.Any(obj => obj.Key == fileName);
-            }
-            catch (Exception ex)
-            {
-                Log(rowNumber, $"Error checking file existence: {ex.Message}");
-                return false;
-            }
-        }
-
-        private async Task UploadToS3(AmazonS3Client s3Client, string bucketName, string fileName, Stream fileStream, int rowNumber)
-        {
-            try
-            {
-                var request = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = fileName,
-                    InputStream = fileStream
-                };
-
-                await s3Client.PutObjectAsync(request);
-            }
-            catch (Exception ex)
-            {
-                Log(rowNumber, $"Error uploading {fileName}: {ex.Message}");
             }
         }
 
@@ -469,6 +422,12 @@ namespace TransferMediaCsvToS3App
                 {
                     txtAzureConnectionString.Text = keys["connection_string"];
                     txtAzureContainerName.Text = keys["container_name"];
+
+                    if (keys.ContainsKey("folder_path"))
+                    {
+                        txtAzureFolderPath.Text = keys["folder_path"];
+                    }
+
                     return true;
                 }
                 return false;
@@ -477,7 +436,7 @@ namespace TransferMediaCsvToS3App
 
         private void btnAzureKeysCsvTemplateDownload_Click(object sender, EventArgs e)
         {
-            string azureTemplate = "connection_string,container_name\n";
+            string azureTemplate = "connection_string,container_name,folder_path\n";
             DownloadKeysTemplate("azure_keys_template.csv", azureTemplate, "Azure Blob");
         }
 

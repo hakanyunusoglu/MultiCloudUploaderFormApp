@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransferMediaCsvToS3App", "TransferMediaCsvToS3App.csproj", "{AF8E2A6F-071B-4F0D-8BA8-4FA41E02255F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiCloudUploaderFormApp", "MultiCloudUploaderFormApp.csproj", "{AF8E2A6F-071B-4F0D-8BA8-4FA41E02255F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,6 @@
-﻿using System.Drawing;
-
-namespace TransferMediaCsvToS3App
+﻿namespace TransferMediaCsvToS3App
 {
-    partial class CsvToS3Uploader
+    partial class MultiCloudUploaderForm
     {
         /// <summary>
         /// Required designer variable.
@@ -30,6 +28,8 @@ namespace TransferMediaCsvToS3App
         /// </summary>
         private void InitializeComponent()
         {
+            this.chkAwsOnlyLatestMedia = new System.Windows.Forms.CheckBox();
+            this.chkAzureOnlyLatestMedia = new System.Windows.Forms.CheckBox();
             this.txtAccessKey = new System.Windows.Forms.TextBox();
             this.lblAccessKey = new System.Windows.Forms.Label();
             this.lblSecretKey = new System.Windows.Forms.Label();
@@ -59,6 +59,8 @@ namespace TransferMediaCsvToS3App
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPageAWS = new System.Windows.Forms.TabPage();
             this.tabPageAzure = new System.Windows.Forms.TabPage();
+            this.lblAzureFolderPath = new System.Windows.Forms.Label();
+            this.txtAzureFolderPath = new System.Windows.Forms.TextBox();
             this.tabPageFile = new System.Windows.Forms.TabPage();
             this.tabPageTransfer = new System.Windows.Forms.TabPage();
             this.tabControl.SuspendLayout();
@@ -67,6 +69,26 @@ namespace TransferMediaCsvToS3App
             this.tabPageFile.SuspendLayout();
             this.tabPageTransfer.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // chkAwsOnlyLatestMedia
+            // 
+            this.chkAwsOnlyLatestMedia.AutoSize = true;
+            this.chkAwsOnlyLatestMedia.Location = new System.Drawing.Point(161, 169);
+            this.chkAwsOnlyLatestMedia.Name = "chkAwsOnlyLatestMedia";
+            this.chkAwsOnlyLatestMedia.Size = new System.Drawing.Size(184, 20);
+            this.chkAwsOnlyLatestMedia.TabIndex = 20;
+            this.chkAwsOnlyLatestMedia.Text = "Only Upload Latest Media";
+            this.chkAwsOnlyLatestMedia.UseVisualStyleBackColor = true;
+            // 
+            // chkAzureOnlyLatestMedia
+            // 
+            this.chkAzureOnlyLatestMedia.AutoSize = true;
+            this.chkAzureOnlyLatestMedia.Location = new System.Drawing.Point(161, 140);
+            this.chkAzureOnlyLatestMedia.Name = "chkAzureOnlyLatestMedia";
+            this.chkAzureOnlyLatestMedia.Size = new System.Drawing.Size(184, 20);
+            this.chkAzureOnlyLatestMedia.TabIndex = 20;
+            this.chkAzureOnlyLatestMedia.Text = "Only Upload Latest Media";
+            this.chkAzureOnlyLatestMedia.UseVisualStyleBackColor = true;
             // 
             // txtAccessKey
             // 
@@ -161,7 +183,7 @@ namespace TransferMediaCsvToS3App
             this.btnFillKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.btnFillKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFillKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnFillKeysFromCsv.Location = new System.Drawing.Point(20, 180);
+            this.btnFillKeysFromCsv.Location = new System.Drawing.Point(20, 206);
             this.btnFillKeysFromCsv.Name = "btnFillKeysFromCsv";
             this.btnFillKeysFromCsv.Size = new System.Drawing.Size(170, 37);
             this.btnFillKeysFromCsv.TabIndex = 17;
@@ -174,7 +196,7 @@ namespace TransferMediaCsvToS3App
             this.btnKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 180);
+            this.btnKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 206);
             this.btnKeysCsvTemplateDownload.Name = "btnKeysCsvTemplateDownload";
             this.btnKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
             this.btnKeysCsvTemplateDownload.TabIndex = 18;
@@ -238,7 +260,7 @@ namespace TransferMediaCsvToS3App
             this.btnFillAzureKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.btnFillAzureKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFillAzureKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 120);
+            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 179);
             this.btnFillAzureKeysFromCsv.Name = "btnFillAzureKeysFromCsv";
             this.btnFillAzureKeysFromCsv.Size = new System.Drawing.Size(170, 37);
             this.btnFillAzureKeysFromCsv.TabIndex = 17;
@@ -251,7 +273,7 @@ namespace TransferMediaCsvToS3App
             this.btnAzureKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnAzureKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAzureKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 120);
+            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 179);
             this.btnAzureKeysCsvTemplateDownload.Name = "btnAzureKeysCsvTemplateDownload";
             this.btnAzureKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
             this.btnAzureKeysCsvTemplateDownload.TabIndex = 18;
@@ -382,6 +404,7 @@ namespace TransferMediaCsvToS3App
             this.tabPageAWS.Controls.Add(this.txtRegion);
             this.tabPageAWS.Controls.Add(this.lblBucketName);
             this.tabPageAWS.Controls.Add(this.txtBucketName);
+            this.tabPageAWS.Controls.Add(this.chkAwsOnlyLatestMedia);
             this.tabPageAWS.Location = new System.Drawing.Point(4, 25);
             this.tabPageAWS.Name = "tabPageAWS";
             this.tabPageAWS.Padding = new System.Windows.Forms.Padding(3);
@@ -399,6 +422,9 @@ namespace TransferMediaCsvToS3App
             this.tabPageAzure.Controls.Add(this.txtAzureConnectionString);
             this.tabPageAzure.Controls.Add(this.lblAzureContainerName);
             this.tabPageAzure.Controls.Add(this.txtAzureContainerName);
+            this.tabPageAzure.Controls.Add(this.chkAzureOnlyLatestMedia);
+            this.tabPageAzure.Controls.Add(this.lblAzureFolderPath);
+            this.tabPageAzure.Controls.Add(this.txtAzureFolderPath);
             this.tabPageAzure.Location = new System.Drawing.Point(4, 25);
             this.tabPageAzure.Name = "tabPageAzure";
             this.tabPageAzure.Padding = new System.Windows.Forms.Padding(3);
@@ -406,6 +432,24 @@ namespace TransferMediaCsvToS3App
             this.tabPageAzure.TabIndex = 2;
             this.tabPageAzure.Text = "Azure Blob";
             this.tabPageAzure.UseVisualStyleBackColor = true;
+            // 
+            // lblAzureFolderPath
+            // 
+            this.lblAzureFolderPath.AutoSize = true;
+            this.lblAzureFolderPath.Location = new System.Drawing.Point(20, 108);
+            this.lblAzureFolderPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblAzureFolderPath.Name = "lblAzureFolderPath";
+            this.lblAzureFolderPath.Size = new System.Drawing.Size(76, 16);
+            this.lblAzureFolderPath.TabIndex = 5;
+            this.lblAzureFolderPath.Text = "Folder Path";
+            // 
+            // txtAzureFolderPath
+            // 
+            this.txtAzureFolderPath.Location = new System.Drawing.Point(160, 105);
+            this.txtAzureFolderPath.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAzureFolderPath.Name = "txtAzureFolderPath";
+            this.txtAzureFolderPath.Size = new System.Drawing.Size(650, 22);
+            this.txtAzureFolderPath.TabIndex = 6;
             // 
             // tabPageFile
             // 
@@ -435,7 +479,7 @@ namespace TransferMediaCsvToS3App
             this.tabPageTransfer.Text = "Transfer";
             this.tabPageTransfer.UseVisualStyleBackColor = true;
             // 
-            // CsvToS3Uploader
+            // MultiCloudUploaderForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -444,7 +488,7 @@ namespace TransferMediaCsvToS3App
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "CsvToS3Uploader";
+            this.Name = "MultiCloudUploaderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Multi Cloud Media Uploader";
             this.tabControl.ResumeLayout(false);
@@ -481,6 +525,8 @@ namespace TransferMediaCsvToS3App
         private System.Windows.Forms.Button btnDownloadCsvTemplate;
         private System.Windows.Forms.Button btnFillKeysFromCsv;
         private System.Windows.Forms.Button btnKeysCsvTemplateDownload;
+        private System.Windows.Forms.CheckBox chkAwsOnlyLatestMedia;
+        private System.Windows.Forms.CheckBox chkAzureOnlyLatestMedia;
 
         // Azure için yeni kontroller
         private System.Windows.Forms.TextBox txtAzureConnectionString;
@@ -490,6 +536,8 @@ namespace TransferMediaCsvToS3App
         private System.Windows.Forms.Button btnAzureVisibleKey;
         private System.Windows.Forms.Button btnFillAzureKeysFromCsv;
         private System.Windows.Forms.Button btnAzureKeysCsvTemplateDownload;
+        private System.Windows.Forms.Label lblAzureFolderPath;
+        private System.Windows.Forms.TextBox txtAzureFolderPath;
 
         // Tab kontrolü
         private System.Windows.Forms.TabControl tabControl;

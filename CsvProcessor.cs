@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace TransferMediaCsvToS3App
 {
-    public class CsvProcessor
+    public static class CsvProcessor
     {
         public static List<CsvRecordModel> ProcessCsvRecords(IEnumerable<dynamic> records)
         {
@@ -32,6 +32,11 @@ namespace TransferMediaCsvToS3App
             }
 
             return processedRecords;
+        }
+
+        public static List<CsvRecordModel> GetLatestRecords(this IEnumerable<CsvRecordModel> records)
+        {
+            return records.Where(r => r.IsLatestRecord).ToList();
         }
     }
 }

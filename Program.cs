@@ -39,7 +39,7 @@ namespace TransferMediaCsvToS3App
                 }
             }
 
-            Application.Run(new CsvToS3Uploader());
+            Application.Run(new MultiCloudUploaderForm());
         }
     }
 }

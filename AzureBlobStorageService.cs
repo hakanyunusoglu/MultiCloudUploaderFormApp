@@ -13,11 +13,12 @@ namespace TransferMediaCsvToS3App
         private readonly string _containerName;
         private readonly BlobServiceClient _blobServiceClient;
         private readonly BlobContainerClient _containerClient;
-
-        public AzureBlobStorageService(string connectionString, string containerName)
+        public string FolderPath { get; set; } = string.Empty;
+        public AzureBlobStorageService(string connectionString, string containerName, string folderPath = "")
         {
             _connectionString = connectionString;
             _containerName = containerName;
+            FolderPath = folderPath;
 
             _blobServiceClient = new BlobServiceClient(_connectionString);
             _containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
@@ -27,7 +28,6 @@ namespace TransferMediaCsvToS3App
         {
             try
             {
-                // Bağlantıyı kontrol etmek için container'ın var olup olmadığını kontrol ediyoruz
                 await _containerClient.GetPropertiesAsync();
                 return true;
             }
@@ -50,9 +50,13 @@ namespace TransferMediaCsvToS3App
             }
         }
 
-        public async Task UploadBlobAsync(string blobName, Stream content, Action<long> progressHandler = null, CancellationToken cancellationToken = default)
+        public async Task UploadBlobAsync(string fileName, Stream content, Action<long> progressHandler = null, CancellationToken cancellationToken = default)
         {
-            BlobClient blobClient = _containerClient.GetBlobClient(blobName);
+            string fullPath = string.IsNullOrEmpty(FolderPath)
+          ? fileName
+          : Path.Combine(FolderPath.TrimEnd('/'), fileName).Replace("\\", "/");
+
+            BlobClient blobClient = _containerClient.GetBlobClient(fullPath);
 
             BlobUploadOptions options = new BlobUploadOptions
             {
@@ -62,7 +66,6 @@ namespace TransferMediaCsvToS3App
                 }),
                 TransferOptions = new Azure.Storage.StorageTransferOptions
                 {
-                    // Varsayılan değerler
                     InitialTransferSize = 8 * 1024 * 1024,
                     MaximumTransferSize = 4 * 1024 * 1024
                 }

@@ -142,14 +142,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AwsS3StorageService.cs" />
     <Compile Include="AzureBlobStorageService.cs" />
     <Compile Include="CsvProcessor.cs" />
     <Compile Include="CsvRecordModel.cs" />
-    <Compile Include="CsvToS3UploaderForm.cs">
+    <Compile Include="MultiCloudUploaderForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CsvToS3UploaderForm.Designer.cs">
-      <DependentUpon>CsvToS3UploaderForm.cs</DependentUpon>
+    <Compile Include="MultiCloudUploaderForm.Designer.cs">
+      <DependentUpon>MultiCloudUploaderForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -159,8 +160,8 @@
     <Compile Include="ViewFileModalForm.Designer.cs">
       <DependentUpon>ViewFileModalForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="CsvToS3UploaderForm.resx">
-      <DependentUpon>CsvToS3UploaderForm.cs</DependentUpon>
+    <EmbeddedResource Include="MultiCloudUploaderForm.resx">
+      <DependentUpon>MultiCloudUploaderForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
