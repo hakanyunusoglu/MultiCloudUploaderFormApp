@@ -59,24 +59,24 @@
             this.rtbLogs = new System.Windows.Forms.RichTextBox();
             this.btnTransferStop = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabPageProviderSelection = new System.Windows.Forms.TabPage();
+            this.btnSelectProvider = new System.Windows.Forms.Button();
+            this.lblProviderSelection = new System.Windows.Forms.Label();
+            this.rbAzureBlob = new System.Windows.Forms.RadioButton();
+            this.rbAwsS3 = new System.Windows.Forms.RadioButton();
             this.tabPageAWS = new System.Windows.Forms.TabPage();
             this.tabPageAzure = new System.Windows.Forms.TabPage();
             this.lblAzureFolderPath = new System.Windows.Forms.Label();
             this.txtAzureFolderPath = new System.Windows.Forms.TextBox();
             this.tabPageFile = new System.Windows.Forms.TabPage();
             this.tabPageTransfer = new System.Windows.Forms.TabPage();
-            this.rbAwsS3 = new System.Windows.Forms.RadioButton();
-            this.rbAzureBlob = new System.Windows.Forms.RadioButton();
-            this.lblProviderSelection = new System.Windows.Forms.Label();
-            this.btnSelectProvider = new System.Windows.Forms.Button();
-            this.tabPageProviderSelection = new System.Windows.Forms.TabPage();
             this.btnClearLog = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
+            this.tabPageProviderSelection.SuspendLayout();
             this.tabPageAWS.SuspendLayout();
             this.tabPageAzure.SuspendLayout();
             this.tabPageFile.SuspendLayout();
             this.tabPageTransfer.SuspendLayout();
-            this.tabPageProviderSelection.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkAwsOnlyLatestMedia
@@ -409,6 +409,7 @@
             // 
             // tabControl
             // 
+            this.tabControl.Controls.Add(this.tabPageProviderSelection);
             this.tabControl.Controls.Add(this.tabPageAWS);
             this.tabControl.Controls.Add(this.tabPageAzure);
             this.tabControl.Controls.Add(this.tabPageFile);
@@ -418,6 +419,66 @@
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(825, 751);
             this.tabControl.TabIndex = 19;
+            // 
+            // tabPageProviderSelection
+            // 
+            this.tabPageProviderSelection.Controls.Add(this.btnSelectProvider);
+            this.tabPageProviderSelection.Controls.Add(this.lblProviderSelection);
+            this.tabPageProviderSelection.Controls.Add(this.rbAzureBlob);
+            this.tabPageProviderSelection.Controls.Add(this.rbAwsS3);
+            this.tabPageProviderSelection.Location = new System.Drawing.Point(4, 25);
+            this.tabPageProviderSelection.Name = "tabPageProviderSelection";
+            this.tabPageProviderSelection.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageProviderSelection.Size = new System.Drawing.Size(817, 722);
+            this.tabPageProviderSelection.TabIndex = 0;
+            this.tabPageProviderSelection.Text = "Provider Selection";
+            this.tabPageProviderSelection.UseVisualStyleBackColor = true;
+            // 
+            // btnSelectProvider
+            // 
+            this.btnSelectProvider.BackColor = System.Drawing.Color.LightBlue;
+            this.btnSelectProvider.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10F);
+            this.btnSelectProvider.Location = new System.Drawing.Point(300, 400);
+            this.btnSelectProvider.Name = "btnSelectProvider";
+            this.btnSelectProvider.Size = new System.Drawing.Size(200, 50);
+            this.btnSelectProvider.TabIndex = 3;
+            this.btnSelectProvider.Text = "Continue";
+            this.btnSelectProvider.UseVisualStyleBackColor = false;
+            this.btnSelectProvider.Click += new System.EventHandler(this.btnSelectProvider_Click);
+            // 
+            // lblProviderSelection
+            // 
+            this.lblProviderSelection.AutoSize = true;
+            this.lblProviderSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
+            this.lblProviderSelection.Location = new System.Drawing.Point(296, 200);
+            this.lblProviderSelection.Name = "lblProviderSelection";
+            this.lblProviderSelection.Size = new System.Drawing.Size(276, 31);
+            this.lblProviderSelection.TabIndex = 2;
+            this.lblProviderSelection.Text = "Select Cloud Provider";
+            // 
+            // rbAzureBlob
+            // 
+            this.rbAzureBlob.AutoSize = true;
+            this.rbAzureBlob.Location = new System.Drawing.Point(300, 350);
+            this.rbAzureBlob.Name = "rbAzureBlob";
+            this.rbAzureBlob.Size = new System.Drawing.Size(144, 20);
+            this.rbAzureBlob.TabIndex = 1;
+            this.rbAzureBlob.TabStop = true;
+            this.rbAzureBlob.Text = "Azure Blob Storage";
+            this.rbAzureBlob.UseVisualStyleBackColor = true;
+            this.rbAzureBlob.CheckedChanged += new System.EventHandler(this.rbAzureBlob_CheckedChanged);
+            // 
+            // rbAwsS3
+            // 
+            this.rbAwsS3.AutoSize = true;
+            this.rbAwsS3.Location = new System.Drawing.Point(300, 300);
+            this.rbAwsS3.Name = "rbAwsS3";
+            this.rbAwsS3.Size = new System.Drawing.Size(78, 20);
+            this.rbAwsS3.TabIndex = 0;
+            this.rbAwsS3.TabStop = true;
+            this.rbAwsS3.Text = "AWS S3";
+            this.rbAwsS3.UseVisualStyleBackColor = true;
+            this.rbAwsS3.CheckedChanged += new System.EventHandler(this.rbAwsS3_CheckedChanged);
             // 
             // tabPageAWS
             // 
@@ -510,66 +571,6 @@
             this.tabPageTransfer.Text = "Transfer";
             this.tabPageTransfer.UseVisualStyleBackColor = true;
             // 
-            // rbAwsS3
-            // 
-            this.rbAwsS3.AutoSize = true;
-            this.rbAwsS3.Location = new System.Drawing.Point(300, 300);
-            this.rbAwsS3.Name = "rbAwsS3";
-            this.rbAwsS3.Size = new System.Drawing.Size(78, 20);
-            this.rbAwsS3.TabIndex = 0;
-            this.rbAwsS3.TabStop = true;
-            this.rbAwsS3.Text = "AWS S3";
-            this.rbAwsS3.UseVisualStyleBackColor = true;
-            this.rbAwsS3.CheckedChanged += new System.EventHandler(this.rbAwsS3_CheckedChanged);
-            // 
-            // rbAzureBlob
-            // 
-            this.rbAzureBlob.AutoSize = true;
-            this.rbAzureBlob.Location = new System.Drawing.Point(300, 350);
-            this.rbAzureBlob.Name = "rbAzureBlob";
-            this.rbAzureBlob.Size = new System.Drawing.Size(144, 20);
-            this.rbAzureBlob.TabIndex = 1;
-            this.rbAzureBlob.TabStop = true;
-            this.rbAzureBlob.Text = "Azure Blob Storage";
-            this.rbAzureBlob.UseVisualStyleBackColor = true;
-            this.rbAzureBlob.CheckedChanged += new System.EventHandler(this.rbAzureBlob_CheckedChanged);
-            // 
-            // lblProviderSelection
-            // 
-            this.lblProviderSelection.AutoSize = true;
-            this.lblProviderSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
-            this.lblProviderSelection.Location = new System.Drawing.Point(296, 200);
-            this.lblProviderSelection.Name = "lblProviderSelection";
-            this.lblProviderSelection.Size = new System.Drawing.Size(276, 31);
-            this.lblProviderSelection.TabIndex = 2;
-            this.lblProviderSelection.Text = "Select Cloud Provider";
-            // 
-            // btnSelectProvider
-            // 
-            this.btnSelectProvider.BackColor = System.Drawing.Color.LightBlue;
-            this.btnSelectProvider.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10F);
-            this.btnSelectProvider.Location = new System.Drawing.Point(300, 400);
-            this.btnSelectProvider.Name = "btnSelectProvider";
-            this.btnSelectProvider.Size = new System.Drawing.Size(200, 50);
-            this.btnSelectProvider.TabIndex = 3;
-            this.btnSelectProvider.Text = "Continue";
-            this.btnSelectProvider.UseVisualStyleBackColor = false;
-            this.btnSelectProvider.Click += new System.EventHandler(this.btnSelectProvider_Click);
-            // 
-            // tabPageProviderSelection
-            // 
-            this.tabPageProviderSelection.Controls.Add(this.btnSelectProvider);
-            this.tabPageProviderSelection.Controls.Add(this.lblProviderSelection);
-            this.tabPageProviderSelection.Controls.Add(this.rbAzureBlob);
-            this.tabPageProviderSelection.Controls.Add(this.rbAwsS3);
-            this.tabPageProviderSelection.Location = new System.Drawing.Point(4, 25);
-            this.tabPageProviderSelection.Name = "tabPageProviderSelection";
-            this.tabPageProviderSelection.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageProviderSelection.Size = new System.Drawing.Size(826, 828);
-            this.tabPageProviderSelection.TabIndex = 0;
-            this.tabPageProviderSelection.Text = "Provider Selection";
-            this.tabPageProviderSelection.UseVisualStyleBackColor = true;
-            // 
             // btnClearLog
             // 
             this.btnClearLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
@@ -578,7 +579,7 @@
             this.btnClearLog.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
             this.btnClearLog.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnClearLog.Location = new System.Drawing.Point(10, 669);
-            this.btnClearLog.Name = "button1";
+            this.btnClearLog.Name = "btnClearLog";
             this.btnClearLog.Size = new System.Drawing.Size(116, 42);
             this.btnClearLog.TabIndex = 15;
             this.btnClearLog.Text = "CLEAR";
@@ -597,7 +598,10 @@
             this.Name = "MultiCloudUploaderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Multi Cloud Media Uploader";
+            this.Load += new System.EventHandler(this.MultiCloudUploaderForm_Load);
             this.tabControl.ResumeLayout(false);
+            this.tabPageProviderSelection.ResumeLayout(false);
+            this.tabPageProviderSelection.PerformLayout();
             this.tabPageAWS.ResumeLayout(false);
             this.tabPageAWS.PerformLayout();
             this.tabPageAzure.ResumeLayout(false);
@@ -605,8 +609,6 @@
             this.tabPageFile.ResumeLayout(false);
             this.tabPageFile.PerformLayout();
             this.tabPageTransfer.ResumeLayout(false);
-            this.tabPageProviderSelection.ResumeLayout(false);
-            this.tabPageProviderSelection.PerformLayout();
             this.ResumeLayout(false);
 
         }

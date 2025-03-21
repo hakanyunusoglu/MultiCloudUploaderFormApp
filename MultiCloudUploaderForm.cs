@@ -637,5 +637,10 @@ namespace TransferMediaCsvToS3App
         {
             rtbLogs.Clear();
         }
+
+        private void MultiCloudUploaderForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
