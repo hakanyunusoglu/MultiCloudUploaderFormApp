@@ -120,6 +120,7 @@ namespace TransferMediaCsvToS3App
                 _cancellationTokenSource = new CancellationTokenSource();
                 btnTransferStop.Enabled = true;
                 btnClearLog.Enabled = false;
+                tabControl.TabPages.Remove(tabPageProviderSelection);
 
                 if (currentProvider == StorageProvider.AwsS3)
                 {
@@ -134,6 +135,7 @@ namespace TransferMediaCsvToS3App
             {
                 MessageBox.Show("Transfer operation was stopped by the user!", "Process Stopped", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Log(0, "Transfer operation was stopped by the user!");
+                tabControl.TabPages.Insert(0, tabPageProviderSelection);
             }
             catch (Exception ex)
             {
@@ -143,6 +145,7 @@ namespace TransferMediaCsvToS3App
             {
                 btnTransferStop.Enabled = false;
                 btnClearLog.Enabled = true;
+                tabControl.TabPages.Insert(0, tabPageProviderSelection);
             }
         }
 
@@ -636,11 +639,6 @@ namespace TransferMediaCsvToS3App
         private void btnClearLog_Click(object sender, EventArgs e)
         {
             rtbLogs.Clear();
-        }
-
-        private void MultiCloudUploaderForm_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

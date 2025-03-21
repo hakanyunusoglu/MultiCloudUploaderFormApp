@@ -598,7 +598,6 @@
             this.Name = "MultiCloudUploaderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Multi Cloud Media Uploader";
-            this.Load += new System.EventHandler(this.MultiCloudUploaderForm_Load);
             this.tabControl.ResumeLayout(false);
             this.tabPageProviderSelection.ResumeLayout(false);
             this.tabPageProviderSelection.PerformLayout();
