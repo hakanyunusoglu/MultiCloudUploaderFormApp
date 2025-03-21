@@ -24,44 +24,24 @@ namespace TransferMediaCsvToS3App
 
         public enum StorageProvider
         {
+            None,
             AwsS3,
             AzureBlob
         }
 
-        private StorageProvider currentProvider = StorageProvider.AwsS3;
-
+        private StorageProvider currentProvider = StorageProvider.None;
         public MultiCloudUploaderForm()
         {
             InitializeComponent();
 
-            if (currentProvider == StorageProvider.AwsS3)
-            {
-                rbAwsS3.Checked = true;
-            }
-            else
-            {
-                rbAzureBlob.Checked = true;
-            }
+            tabControl.TabPages.Remove(tabPageAWS);
+            tabControl.TabPages.Remove(tabPageAzure);
+            tabControl.TabPages.Remove(tabPageFile);
+            tabControl.TabPages.Remove(tabPageTransfer);
+            tabControl.TabPages.Add(tabPageProviderSelection);
 
-            this.StartPosition = FormStartPosition.CenterScreen;
-            Rectangle workingArea = Screen.GetWorkingArea(this);
-
-            this.Width = Math.Min(workingArea.Width, 865);
-            this.Height = Math.Min(workingArea.Height, 920);
-
-            btnTransfer.Enabled = false;
-            btnViewFileData.Enabled = false;
-            btnTransferStop.Enabled = false;
-            btnVisibleKey.Text = "👁️";
-            btnVisibleKey.Font = new Font("Segoe UI", 15, FontStyle.Bold);
-            btnVisibleKey.TextAlign = ContentAlignment.MiddleCenter;
-            txtAccessKey.PasswordChar = '*';
-            txtSecretKey.PasswordChar = '*';
-
-            btnAzureVisibleKey.Text = "👁️";
-            btnAzureVisibleKey.Font = new Font("Segoe UI", 15, FontStyle.Bold);
-            btnAzureVisibleKey.TextAlign = ContentAlignment.MiddleCenter;
-            txtAzureConnectionString.PasswordChar = '*';
+            tabControl.SelectedTab = tabPageProviderSelection;
+            this.btnTransfer.Click += new System.EventHandler(this.btnTransfer_Click);
         }
         private void btnSelectCsv_Click(object sender, EventArgs e)
         {
@@ -109,25 +89,6 @@ namespace TransferMediaCsvToS3App
 
             btnAzureVisibleKey.Text = isAzureKeysVisible ? "🔒" : "👁️";
         }
-
-        private void rbAwsS3_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rbAwsS3.Checked)
-            {
-                currentProvider = StorageProvider.AwsS3;
-                tabControl.SelectedTab = tabPageAWS;
-            }
-        }
-
-        private void rbAzureBlob_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rbAzureBlob.Checked)
-            {
-                currentProvider = StorageProvider.AzureBlob;
-                tabControl.SelectedTab = tabPageAzure;
-            }
-        }
-
         private void btnViewFileData_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(selectedCsvFilePath))
@@ -144,6 +105,15 @@ namespace TransferMediaCsvToS3App
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"Transfer initiated. Current Provider: {currentProvider}");
+
+                if (currentProvider == StorageProvider.None)
+                {
+                    MessageBox.Show("Please select a cloud provider first!", "Provider Not Selected",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 _cancellationTokenSource = new CancellationTokenSource();
                 btnTransferStop.Enabled = true;
 
@@ -389,6 +359,60 @@ namespace TransferMediaCsvToS3App
                         MessageBox.Show($"Error saving file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+            }
+        }
+
+        private void rbAwsS3_CheckedChanged(object sender, EventArgs e)
+        {
+            btnSelectProvider.Enabled = rbAwsS3.Checked || rbAzureBlob.Checked;
+        }
+
+        private void rbAzureBlob_CheckedChanged(object sender, EventArgs e)
+        {
+            btnSelectProvider.Enabled = rbAwsS3.Checked || rbAzureBlob.Checked;
+        }
+
+        private void btnSelectProvider_Click(object sender, EventArgs e)
+        {
+            tabControl.TabPages.Clear();
+
+            tabControl.TabPages.Add(tabPageProviderSelection);
+
+            if (rbAwsS3.Checked)
+            {
+                currentProvider = StorageProvider.AwsS3;
+
+                if (!tabControl.TabPages.Contains(tabPageProviderSelection))
+                    tabControl.TabPages.Add(tabPageProviderSelection);
+
+                if (!tabControl.TabPages.Contains(tabPageAWS))
+                    tabControl.TabPages.Add(tabPageAWS);
+
+                if (!tabControl.TabPages.Contains(tabPageFile))
+                    tabControl.TabPages.Add(tabPageFile);
+
+                if (!tabControl.TabPages.Contains(tabPageTransfer))
+                    tabControl.TabPages.Add(tabPageTransfer);
+
+                tabControl.SelectedTab = tabPageAWS;
+            }
+            else if (rbAzureBlob.Checked)
+            {
+                currentProvider = StorageProvider.AzureBlob;
+
+                if (!tabControl.TabPages.Contains(tabPageProviderSelection))
+                    tabControl.TabPages.Add(tabPageProviderSelection);
+
+                if (!tabControl.TabPages.Contains(tabPageAzure))
+                    tabControl.TabPages.Add(tabPageAzure);
+
+                if (!tabControl.TabPages.Contains(tabPageFile))
+                    tabControl.TabPages.Add(tabPageFile);
+
+                if (!tabControl.TabPages.Contains(tabPageTransfer))
+                    tabControl.TabPages.Add(tabPageTransfer);
+
+                tabControl.SelectedTab = tabPageAzure;
             }
         }
 

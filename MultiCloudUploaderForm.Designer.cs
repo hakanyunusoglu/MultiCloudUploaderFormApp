@@ -61,14 +61,21 @@
             this.tabPageAzure = new System.Windows.Forms.TabPage();
             this.lblAzureFolderPath = new System.Windows.Forms.Label();
             this.txtAzureFolderPath = new System.Windows.Forms.TextBox();
+            this.rbAwsS3 = new System.Windows.Forms.RadioButton();
+            this.rbAzureBlob = new System.Windows.Forms.RadioButton();
+            this.lblProviderSelection = new System.Windows.Forms.Label();
+            this.btnSelectProvider = new System.Windows.Forms.Button();
             this.tabPageFile = new System.Windows.Forms.TabPage();
             this.tabPageTransfer = new System.Windows.Forms.TabPage();
+            this.tabPageProviderSelection = new System.Windows.Forms.TabPage();
+            this.tabPageProviderSelection.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabPageAWS.SuspendLayout();
             this.tabPageAzure.SuspendLayout();
             this.tabPageFile.SuspendLayout();
             this.tabPageTransfer.SuspendLayout();
             this.SuspendLayout();
+
             // 
             // chkAwsOnlyLatestMedia
             // 
@@ -442,6 +449,57 @@
             this.lblAzureFolderPath.Size = new System.Drawing.Size(76, 16);
             this.lblAzureFolderPath.TabIndex = 5;
             this.lblAzureFolderPath.Text = "Folder Path";
+
+            // 
+            // rbAwsS3
+            // 
+            this.rbAwsS3.AutoSize = true;
+            this.rbAwsS3.Location = new System.Drawing.Point(300, 300);
+            this.rbAwsS3.Name = "rbAwsS3";
+            this.rbAwsS3.Size = new System.Drawing.Size(200, 21);
+            this.rbAwsS3.TabIndex = 0;
+            this.rbAwsS3.TabStop = true;
+            this.rbAwsS3.Text = "AWS S3";
+            this.rbAwsS3.UseVisualStyleBackColor = true;
+            this.rbAwsS3.CheckedChanged += new System.EventHandler(this.rbAwsS3_CheckedChanged);
+
+            // 
+            // rbAzureBlob
+            // 
+            this.rbAzureBlob.AutoSize = true;
+            this.rbAzureBlob.Location = new System.Drawing.Point(300, 350);
+            this.rbAzureBlob.Name = "rbAzureBlob";
+            this.rbAzureBlob.Size = new System.Drawing.Size(200, 21);
+            this.rbAzureBlob.TabIndex = 1;
+            this.rbAzureBlob.TabStop = true;
+            this.rbAzureBlob.Text = "Azure Blob Storage";
+            this.rbAzureBlob.UseVisualStyleBackColor = true;
+            this.rbAzureBlob.CheckedChanged += new System.EventHandler(this.rbAzureBlob_CheckedChanged);
+
+            // 
+            // lblProviderSelection
+            // 
+            this.lblProviderSelection.AutoSize = true;
+            this.lblProviderSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
+            this.lblProviderSelection.Location = new System.Drawing.Point(296, 200);
+            this.lblProviderSelection.Name = "lblProviderSelection";
+            this.lblProviderSelection.Size = new System.Drawing.Size(250, 31);
+            this.lblProviderSelection.TabIndex = 2;
+            this.lblProviderSelection.Text = "Select Cloud Provider";
+
+            // 
+            // btnSelectProvider
+            // 
+            this.btnSelectProvider.BackColor = System.Drawing.Color.LightBlue;
+            this.btnSelectProvider.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10F);
+            this.btnSelectProvider.Location = new System.Drawing.Point(300, 400);
+            this.btnSelectProvider.Name = "btnSelectProvider";
+            this.btnSelectProvider.Size = new System.Drawing.Size(200, 50);
+            this.btnSelectProvider.TabIndex = 3;
+            this.btnSelectProvider.Text = "Continue";
+            this.btnSelectProvider.UseVisualStyleBackColor = false;
+            this.btnSelectProvider.Click += new System.EventHandler(this.btnSelectProvider_Click);
+
             // 
             // txtAzureFolderPath
             // 
@@ -478,6 +536,21 @@
             this.tabPageTransfer.TabIndex = 4;
             this.tabPageTransfer.Text = "Transfer";
             this.tabPageTransfer.UseVisualStyleBackColor = true;
+
+            // tabPageProviderSelection
+            // 
+            this.tabPageProviderSelection.Controls.Add(this.btnSelectProvider);
+            this.tabPageProviderSelection.Controls.Add(this.lblProviderSelection);
+            this.tabPageProviderSelection.Controls.Add(this.rbAzureBlob);
+            this.tabPageProviderSelection.Controls.Add(this.rbAwsS3);
+            this.tabPageProviderSelection.Location = new System.Drawing.Point(4, 25);
+            this.tabPageProviderSelection.Name = "tabPageProviderSelection";
+            this.tabPageProviderSelection.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageProviderSelection.Size = new System.Drawing.Size(826, 828);
+            this.tabPageProviderSelection.TabIndex = 0;
+            this.tabPageProviderSelection.Text = "Provider Selection";
+            this.tabPageProviderSelection.UseVisualStyleBackColor = true;
+
             // 
             // MultiCloudUploaderForm
             // 
@@ -491,6 +564,8 @@
             this.Name = "MultiCloudUploaderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Multi Cloud Media Uploader";
+            this.tabPageProviderSelection.ResumeLayout(false);
+            this.tabPageProviderSelection.PerformLayout();
             this.tabControl.ResumeLayout(false);
             this.tabPageAWS.ResumeLayout(false);
             this.tabPageAWS.PerformLayout();
@@ -545,6 +620,13 @@
         private System.Windows.Forms.TabPage tabPageAzure;
         private System.Windows.Forms.TabPage tabPageFile;
         private System.Windows.Forms.TabPage tabPageTransfer;
+        private System.Windows.Forms.TabPage tabPageProviderSelection;
+
+        // Provider Selection Components
+        private System.Windows.Forms.RadioButton rbAwsS3;
+        private System.Windows.Forms.RadioButton rbAzureBlob;
+        private System.Windows.Forms.Label lblProviderSelection;
+        private System.Windows.Forms.Button btnSelectProvider;
     }
 }
 
