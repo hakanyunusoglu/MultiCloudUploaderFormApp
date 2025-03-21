@@ -3,6 +3,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using CsvHelper;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -20,9 +21,17 @@ namespace TransferMediaCsvToS3App
     {
         private CancellationTokenSource _cancellationTokenSource;
         private string selectedCsvFilePath;
-        private bool isAccessKeysVisible = false;
+        private bool isAwsKeysVisible = false;
+        private bool isAzureKeysVisible = false;
         private HttpClient _httpClient = new HttpClient();
-        private string accessKeysFilePath;
+
+        public enum StorageProvider
+        {
+            AwsS3,
+            AzureBlob
+        }
+
+        private StorageProvider currentProvider = StorageProvider.AwsS3;
 
         public CsvToS3Uploader()
         {
@@ -31,8 +40,8 @@ namespace TransferMediaCsvToS3App
             this.StartPosition = FormStartPosition.CenterScreen;
             Rectangle workingArea = Screen.GetWorkingArea(this);
 
-            this.Width = Math.Min(workingArea.Width, 665);
-            this.Height = Math.Min(workingArea.Height, 755);
+            this.Width = Math.Min(workingArea.Width, 865);
+            this.Height = Math.Min(workingArea.Height, 920);
 
             btnTransfer.Enabled = false;
             btnViewFileData.Enabled = false;
@@ -42,8 +51,12 @@ namespace TransferMediaCsvToS3App
             btnVisibleKey.TextAlign = ContentAlignment.MiddleCenter;
             txtAccessKey.PasswordChar = '*';
             txtSecretKey.PasswordChar = '*';
-        }
 
+            btnAzureVisibleKey.Text = "👁️";
+            btnAzureVisibleKey.Font = new Font("Segoe UI", 15, FontStyle.Bold);
+            btnAzureVisibleKey.TextAlign = ContentAlignment.MiddleCenter;
+            txtAzureConnectionString.PasswordChar = '*';
+        }
         private void btnSelectCsv_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -74,12 +87,21 @@ namespace TransferMediaCsvToS3App
 
         private void btnVisibleKey_Click(object sender, EventArgs e)
         {
-            isAccessKeysVisible = !isAccessKeysVisible;
+            isAwsKeysVisible = !isAwsKeysVisible;
 
-            txtAccessKey.PasswordChar = isAccessKeysVisible ? '\0' : '*';
-            txtSecretKey.PasswordChar = isAccessKeysVisible ? '\0' : '*';
+            txtAccessKey.PasswordChar = isAwsKeysVisible ? '\0' : '*';
+            txtSecretKey.PasswordChar = isAwsKeysVisible ? '\0' : '*';
 
-            btnVisibleKey.Text = isAccessKeysVisible ? "🔒" : "👁️";
+            btnVisibleKey.Text = isAwsKeysVisible ? "🔒" : "👁️";
+        }
+
+        private void btnAzureVisibleKey_Click(object sender, EventArgs e)
+        {
+            isAzureKeysVisible = !isAzureKeysVisible;
+
+            txtAzureConnectionString.PasswordChar = isAzureKeysVisible ? '\0' : '*';
+
+            btnAzureVisibleKey.Text = isAzureKeysVisible ? "🔒" : "👁️";
         }
 
         private void btnViewFileData_Click(object sender, EventArgs e)
@@ -96,101 +118,18 @@ namespace TransferMediaCsvToS3App
 
         private async void btnTransfer_Click(object sender, EventArgs e)
         {
-            string csvPath = txtCsvPath.Text;
-            string accessKey = txtAccessKey.Text;
-            string secretKey = txtSecretKey.Text;
-            string region = txtRegion.Text;
-            string bucketName = txtBucketName.Text;
-
-            if (string.IsNullOrEmpty(csvPath) || string.IsNullOrEmpty(accessKey) || string.IsNullOrEmpty(secretKey) ||
-                string.IsNullOrEmpty(region) || string.IsNullOrEmpty(bucketName))
-            {
-                MessageBox.Show("Please fill in all fields for AWS connection!", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             try
             {
-
-                if (!IsValidAWSRegion(region))
-                {
-                    MessageBox.Show($"Invalid AWS region: {region}. Please enter a valid region!", "Region Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.GetBySystemName(region));
-
-                if (!await ValidateS3Client(s3Client, bucketName))
-                {
-                    return;
-                }
-
                 _cancellationTokenSource = new CancellationTokenSource();
                 btnTransferStop.Enabled = true;
 
-                using (var stream = new FileStream(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var reader = new StreamReader(stream))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                if (currentProvider == StorageProvider.AwsS3)
                 {
-                    csv.Read();
-                    csv.ReadHeader();
-
-                    var headers = csv.Context.Reader.HeaderRecord;
-
-                    if (!headers.Contains("media_url") || !headers.Contains("product_stock_code") ||
-                        !headers.Contains("media_direction") || !headers.Contains("created_date"))
-                    {
-                        MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    var records = csv.GetRecords<dynamic>();
-                    var processedRecords = CsvProcessor.ProcessCsvRecords(records);
-
-                    foreach (var record in processedRecords)
-                    {
-                        if (_cancellationTokenSource.Token.IsCancellationRequested)
-                        {
-                            Log(record.RowNumber, "The transfer has been canceled!");
-                            break;
-                        }
-
-                        string mediaUrl = record.media_url;
-                        string stockCode = CleanString(record.product_stock_code);
-                        string mediaDirection = CleanString(record.media_direction);
-
-                        if (!string.IsNullOrEmpty(mediaUrl))
-                        {
-                            var fileStream = await DownloadFile(record.RowNumber, mediaUrl);
-
-                            if (fileStream != null)
-                            {
-                                string fileExtension = Path.GetExtension(mediaUrl);
-                                string fileName;
-
-                                if (record.IsLatestRecord)
-                                {
-                                    fileName = $"{stockCode}_{mediaDirection}{fileExtension}";
-                                }
-                                else
-                                {
-                                    fileName = $"_{stockCode}_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
-                                }
-
-                                bool exists = await CheckIfFileExists(s3Client, bucketName, fileName, record.RowNumber);
-
-                                if (!exists)
-                                {
-                                    await UploadToS3(s3Client, bucketName, fileName, fileStream, record.RowNumber);
-                                    Log(record.RowNumber, $"Uploaded: {fileName}");
-                                }
-                                else
-                                {
-                                    Log(record.RowNumber, $"Skipped (Exists): {fileName}");
-                                }
-                            }
-                        }
-                    }
+                    await TransferToAwsS3();
+                }
+                else
+                {
+                    await TransferToAzureBlob();
                 }
             }
             catch (OperationCanceledException)
@@ -204,6 +143,161 @@ namespace TransferMediaCsvToS3App
             finally
             {
                 btnTransferStop.Enabled = false;
+            }
+        }
+
+        private async Task TransferToAwsS3()
+        {
+            string csvPath = txtCsvPath.Text;
+            string accessKey = txtAccessKey.Text;
+            string secretKey = txtSecretKey.Text;
+            string region = txtRegion.Text;
+            string bucketName = txtBucketName.Text;
+
+            if (string.IsNullOrEmpty(csvPath) || string.IsNullOrEmpty(accessKey) || string.IsNullOrEmpty(secretKey) ||
+                string.IsNullOrEmpty(region) || string.IsNullOrEmpty(bucketName))
+            {
+                MessageBox.Show("Please fill in all fields for AWS connection!", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!IsValidAWSRegion(region))
+            {
+                MessageBox.Show($"Invalid AWS region: {region}. Please enter a valid region!", "Region Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.GetBySystemName(region));
+
+            if (!await ValidateS3Client(s3Client, bucketName))
+            {
+                return;
+            }
+
+            await ProcessCsvAndUpload(csvPath, async (record, fileStream, fileName) =>
+            {
+                bool exists = await CheckIfFileExists(s3Client, bucketName, fileName, record.RowNumber);
+
+                if (!exists)
+                {
+                    await UploadToS3(s3Client, bucketName, fileName, fileStream, record.RowNumber);
+                    Log(record.RowNumber, $"Uploaded: {fileName}");
+                }
+                else
+                {
+                    Log(record.RowNumber, $"Skipped (Exists): {fileName}");
+                }
+            });
+        }
+
+        private async Task TransferToAzureBlob()
+        {
+            string csvPath = txtCsvPath.Text;
+            string connectionString = txtAzureConnectionString.Text;
+            string containerName = txtAzureContainerName.Text;
+
+            if (string.IsNullOrEmpty(csvPath) || string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(containerName))
+            {
+                MessageBox.Show("Please fill in all fields for Azure connection!", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var azureService = new AzureBlobStorageService(connectionString, containerName);
+
+            if (!await ValidateAzureConnection(azureService))
+            {
+                return;
+            }
+
+            await ProcessCsvAndUpload(csvPath, async (record, fileStream, fileName) =>
+            {
+                bool exists = await azureService.CheckIfBlobExistsAsync(fileName);
+
+                if (!exists)
+                {
+                    await azureService.UploadBlobAsync(fileName, fileStream, null, _cancellationTokenSource.Token);
+                    Log(record.RowNumber, $"Uploaded: {fileName}");
+                }
+                else
+                {
+                    Log(record.RowNumber, $"Skipped (Exists): {fileName}");
+                }
+            });
+        }
+
+        private async Task ProcessCsvAndUpload(string csvPath, Func<CsvRecordModel, Stream, string, Task> uploadAction)
+        {
+            using (var stream = new FileStream(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                csv.Read();
+                csv.ReadHeader();
+
+                var headers = csv.Context.Reader.HeaderRecord;
+
+                if (!headers.Contains("media_url") || !headers.Contains("product_stock_code") ||
+                    !headers.Contains("media_direction") || !headers.Contains("created_date"))
+                {
+                    MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var records = csv.GetRecords<dynamic>();
+                var processedRecords = CsvProcessor.ProcessCsvRecords(records);
+
+                foreach (var record in processedRecords)
+                {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        Log(record.RowNumber, "The transfer has been canceled!");
+                        break;
+                    }
+
+                    string mediaUrl = record.media_url;
+                    string stockCode = CleanString(record.product_stock_code);
+                    string mediaDirection = CleanString(record.media_direction);
+
+                    if (!string.IsNullOrEmpty(mediaUrl))
+                    {
+                        var fileStream = await DownloadFile(record.RowNumber, mediaUrl);
+
+                        if (fileStream != null)
+                        {
+                            string fileExtension = Path.GetExtension(mediaUrl);
+                            string fileName;
+
+                            if (record.IsLatestRecord)
+                            {
+                                fileName = $"{stockCode}_{mediaDirection}{fileExtension}";
+                            }
+                            else
+                            {
+                                fileName = $"_{stockCode}_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
+                            }
+
+                            await uploadAction(record, fileStream, fileName);
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task<bool> ValidateAzureConnection(AzureBlobStorageService azureService)
+        {
+            try
+            {
+                bool isValid = await azureService.ValidateConnectionAsync();
+                if (!isValid)
+                {
+                    MessageBox.Show("Failed to connect to Azure Blob Storage with the entered information. Please check your information!", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                return isValid;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error validating Azure connection: {ex.Message}", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
@@ -245,6 +339,7 @@ namespace TransferMediaCsvToS3App
                 return false;
             }
         }
+
         private async Task<Stream> DownloadFile(int rowNumber, string url)
         {
             try
@@ -346,10 +441,52 @@ namespace TransferMediaCsvToS3App
 
         private void btnFillKeysFromCsv_Click(object sender, EventArgs e)
         {
+            LoadKeysFromCsv((keys) =>
+            {
+                if (keys.ContainsKey("access_key") && keys.ContainsKey("secret_access_key") &&
+                    keys.ContainsKey("bucket_name") && keys.ContainsKey("region"))
+                {
+                    txtAccessKey.Text = keys["access_key"];
+                    txtSecretKey.Text = keys["secret_access_key"];
+                    txtBucketName.Text = keys["bucket_name"];
+                    txtRegion.Text = keys["region"];
+                    return true;
+                }
+                return false;
+            }, "AWS S3");
+        }
+
+        private void btnKeysCsvTemplateDownload_Click(object sender, EventArgs e)
+        {
+            DownloadKeysTemplate("keys_template.csv", Properties.Resources.keys_template, "AWS S3");
+        }
+
+        private void btnFillAzureKeysFromCsv_Click(object sender, EventArgs e)
+        {
+            LoadKeysFromCsv((keys) =>
+            {
+                if (keys.ContainsKey("connection_string") && keys.ContainsKey("container_name"))
+                {
+                    txtAzureConnectionString.Text = keys["connection_string"];
+                    txtAzureContainerName.Text = keys["container_name"];
+                    return true;
+                }
+                return false;
+            }, "Azure Blob");
+        }
+
+        private void btnAzureKeysCsvTemplateDownload_Click(object sender, EventArgs e)
+        {
+            string azureTemplate = "connection_string,container_name\n";
+            DownloadKeysTemplate("azure_keys_template.csv", azureTemplate, "Azure Blob");
+        }
+
+        private void LoadKeysFromCsv(Func<Dictionary<string, string>, bool> processKeys, string providerName)
+        {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "CSV files (*.csv)|*.csv";
-                openFileDialog.Title = "Choose AWS Keys File";
+                openFileDialog.Title = $"Choose {providerName} Keys File";
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -369,23 +506,25 @@ namespace TransferMediaCsvToS3App
                             csv.Read();
                             csv.ReadHeader();
 
-                            var headers = csv.Context.Reader.HeaderRecord;
-
-                            if (!headers.Contains("access_key") || !headers.Contains("secret_access_key") ||
-                                !headers.Contains("bucket_name") || !headers.Contains("region"))
-                            {
-                                MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-
                             if (csv.Read())
                             {
-                                txtAccessKey.Text = csv.GetField("access_key").Replace(" ", "").Trim();
-                                txtSecretKey.Text = csv.GetField("secret_access_key").Replace(" ", "").Trim();
-                                txtBucketName.Text = csv.GetField("bucket_name").Replace(" ", "").Trim();
-                                txtRegion.Text = csv.GetField("region").Replace(" ", "").Trim();
+                                var headers = csv.Context.Reader.HeaderRecord;
+                                var keys = new Dictionary<string, string>();
 
-                                MessageBox.Show("AWS Keys information uploaded successfully!", "Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                foreach (var header in headers)
+                                {
+                                    string value = csv.GetField(header)?.Replace(" ", "").Trim() ?? "";
+                                    keys[header.ToLower()] = value;
+                                }
+
+                                if (processKeys(keys))
+                                {
+                                    MessageBox.Show($"{providerName} Keys information uploaded successfully!", "Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                                else
+                                {
+                                    MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
                             }
                             else
                             {
@@ -401,23 +540,23 @@ namespace TransferMediaCsvToS3App
             }
         }
 
-        private void btnKeysCsvTemplateDownload_Click(object sender, EventArgs e)
+        private void DownloadKeysTemplate(string fileName, string template, string providerName)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
                 saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
-                saveFileDialog.Title = "Save Keys Template File";
-                saveFileDialog.FileName = "keys_template.csv";
+                saveFileDialog.Title = $"Save {providerName} Keys Template File";
+                saveFileDialog.FileName = fileName;
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
-                        byte[] fileContent = Encoding.UTF8.GetBytes(Properties.Resources.keys_template);
+                        byte[] fileContent = Encoding.UTF8.GetBytes(template);
 
                         File.WriteAllBytes(saveFileDialog.FileName, fileContent);
 
-                        MessageBox.Show("Keys Template file saved successfully!", "Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show($"{providerName} Keys Template file saved successfully!", "Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {

@@ -1,4 +1,6 @@
-﻿namespace TransferMediaCsvToS3App
+﻿using System.Drawing;
+
+namespace TransferMediaCsvToS3App
 {
     partial class CsvToS3Uploader
     {
@@ -36,31 +38,49 @@
             this.txtRegion = new System.Windows.Forms.TextBox();
             this.lblBucketName = new System.Windows.Forms.Label();
             this.txtBucketName = new System.Windows.Forms.TextBox();
+            this.btnVisibleKey = new System.Windows.Forms.Button();
+            this.btnFillKeysFromCsv = new System.Windows.Forms.Button();
+            this.btnKeysCsvTemplateDownload = new System.Windows.Forms.Button();
+            this.txtAzureConnectionString = new System.Windows.Forms.TextBox();
+            this.lblAzureConnectionString = new System.Windows.Forms.Label();
+            this.lblAzureContainerName = new System.Windows.Forms.Label();
+            this.txtAzureContainerName = new System.Windows.Forms.TextBox();
+            this.btnAzureVisibleKey = new System.Windows.Forms.Button();
+            this.btnFillAzureKeysFromCsv = new System.Windows.Forms.Button();
+            this.btnAzureKeysCsvTemplateDownload = new System.Windows.Forms.Button();
             this.lblCsvPath = new System.Windows.Forms.Label();
             this.txtCsvPath = new System.Windows.Forms.TextBox();
             this.btnSelectCsv = new System.Windows.Forms.Button();
+            this.btnViewFileData = new System.Windows.Forms.Button();
+            this.btnDownloadCsvTemplate = new System.Windows.Forms.Button();
             this.btnTransfer = new System.Windows.Forms.Button();
             this.rtbLogs = new System.Windows.Forms.RichTextBox();
-            this.btnViewFileData = new System.Windows.Forms.Button();
-            this.btnVisibleKey = new System.Windows.Forms.Button();
             this.btnTransferStop = new System.Windows.Forms.Button();
-            this.btnDownloadCsvTemplate = new System.Windows.Forms.Button();
-            this.btnFillKeysFromCsv = new System.Windows.Forms.Button();
-            this.btnKeysCsvTemplateDownload = new System.Windows.Forms.Button();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabPageAWS = new System.Windows.Forms.TabPage();
+            this.tabPageAzure = new System.Windows.Forms.TabPage();
+            this.tabPageFile = new System.Windows.Forms.TabPage();
+            this.tabPageTransfer = new System.Windows.Forms.TabPage();
+            this.tabControl.SuspendLayout();
+            this.tabPageAWS.SuspendLayout();
+            this.tabPageAzure.SuspendLayout();
+            this.tabPageFile.SuspendLayout();
+            this.tabPageTransfer.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtAccessKey
             // 
-            this.txtAccessKey.Location = new System.Drawing.Point(179, 55);
+            this.txtAccessKey.Location = new System.Drawing.Point(160, 45);
             this.txtAccessKey.Margin = new System.Windows.Forms.Padding(4);
             this.txtAccessKey.Name = "txtAccessKey";
-            this.txtAccessKey.Size = new System.Drawing.Size(607, 22);
+            this.txtAccessKey.PasswordChar = '*';
+            this.txtAccessKey.Size = new System.Drawing.Size(590, 22);
             this.txtAccessKey.TabIndex = 0;
             // 
             // lblAccessKey
             // 
             this.lblAccessKey.AutoSize = true;
-            this.lblAccessKey.Location = new System.Drawing.Point(16, 58);
+            this.lblAccessKey.Location = new System.Drawing.Point(20, 48);
             this.lblAccessKey.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAccessKey.Name = "lblAccessKey";
             this.lblAccessKey.Size = new System.Drawing.Size(78, 16);
@@ -70,7 +90,7 @@
             // lblSecretKey
             // 
             this.lblSecretKey.AutoSize = true;
-            this.lblSecretKey.Location = new System.Drawing.Point(16, 88);
+            this.lblSecretKey.Location = new System.Drawing.Point(20, 78);
             this.lblSecretKey.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSecretKey.Name = "lblSecretKey";
             this.lblSecretKey.Size = new System.Drawing.Size(120, 16);
@@ -79,16 +99,17 @@
             // 
             // txtSecretKey
             // 
-            this.txtSecretKey.Location = new System.Drawing.Point(179, 85);
+            this.txtSecretKey.Location = new System.Drawing.Point(160, 75);
             this.txtSecretKey.Margin = new System.Windows.Forms.Padding(4);
             this.txtSecretKey.Name = "txtSecretKey";
-            this.txtSecretKey.Size = new System.Drawing.Size(607, 22);
+            this.txtSecretKey.PasswordChar = '*';
+            this.txtSecretKey.Size = new System.Drawing.Size(590, 22);
             this.txtSecretKey.TabIndex = 2;
             // 
             // lblRegion
             // 
             this.lblRegion.AutoSize = true;
-            this.lblRegion.Location = new System.Drawing.Point(16, 118);
+            this.lblRegion.Location = new System.Drawing.Point(20, 108);
             this.lblRegion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblRegion.Name = "lblRegion";
             this.lblRegion.Size = new System.Drawing.Size(51, 16);
@@ -97,16 +118,16 @@
             // 
             // txtRegion
             // 
-            this.txtRegion.Location = new System.Drawing.Point(179, 115);
+            this.txtRegion.Location = new System.Drawing.Point(160, 105);
             this.txtRegion.Margin = new System.Windows.Forms.Padding(4);
             this.txtRegion.Name = "txtRegion";
-            this.txtRegion.Size = new System.Drawing.Size(667, 22);
+            this.txtRegion.Size = new System.Drawing.Size(650, 22);
             this.txtRegion.TabIndex = 4;
             // 
             // lblBucketName
             // 
             this.lblBucketName.AutoSize = true;
-            this.lblBucketName.Location = new System.Drawing.Point(16, 148);
+            this.lblBucketName.Location = new System.Drawing.Point(20, 138);
             this.lblBucketName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblBucketName.Name = "lblBucketName";
             this.lblBucketName.Size = new System.Drawing.Size(88, 16);
@@ -115,128 +136,32 @@
             // 
             // txtBucketName
             // 
-            this.txtBucketName.Location = new System.Drawing.Point(179, 145);
+            this.txtBucketName.Location = new System.Drawing.Point(160, 135);
             this.txtBucketName.Margin = new System.Windows.Forms.Padding(4);
             this.txtBucketName.Name = "txtBucketName";
-            this.txtBucketName.Size = new System.Drawing.Size(667, 22);
+            this.txtBucketName.Size = new System.Drawing.Size(650, 22);
             this.txtBucketName.TabIndex = 6;
-            // 
-            // lblCsvPath
-            // 
-            this.lblCsvPath.AutoSize = true;
-            this.lblCsvPath.Location = new System.Drawing.Point(16, 178);
-            this.lblCsvPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblCsvPath.Name = "lblCsvPath";
-            this.lblCsvPath.Size = new System.Drawing.Size(34, 16);
-            this.lblCsvPath.TabIndex = 9;
-            this.lblCsvPath.Text = "Path";
-            // 
-            // txtCsvPath
-            // 
-            this.txtCsvPath.Location = new System.Drawing.Point(179, 175);
-            this.txtCsvPath.Margin = new System.Windows.Forms.Padding(4);
-            this.txtCsvPath.Name = "txtCsvPath";
-            this.txtCsvPath.ReadOnly = true;
-            this.txtCsvPath.Size = new System.Drawing.Size(667, 22);
-            this.txtCsvPath.TabIndex = 8;
-            // 
-            // btnSelectCsv
-            // 
-            this.btnSelectCsv.BackColor = System.Drawing.Color.PeachPuff;
-            this.btnSelectCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSelectCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnSelectCsv.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnSelectCsv.Location = new System.Drawing.Point(686, 216);
-            this.btnSelectCsv.Name = "btnSelectCsv";
-            this.btnSelectCsv.Size = new System.Drawing.Size(160, 37);
-            this.btnSelectCsv.TabIndex = 10;
-            this.btnSelectCsv.Text = "File Upload";
-            this.btnSelectCsv.UseVisualStyleBackColor = false;
-            this.btnSelectCsv.Click += new System.EventHandler(this.btnSelectCsv_Click);
-            // 
-            // btnTransfer
-            // 
-            this.btnTransfer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.btnTransfer.Enabled = false;
-            this.btnTransfer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTransfer.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnTransfer.ForeColor = System.Drawing.Color.Green;
-            this.btnTransfer.Location = new System.Drawing.Point(686, 826);
-            this.btnTransfer.Name = "btnTransfer";
-            this.btnTransfer.Size = new System.Drawing.Size(160, 42);
-            this.btnTransfer.TabIndex = 11;
-            this.btnTransfer.Text = "TRANSFER";
-            this.btnTransfer.UseVisualStyleBackColor = false;
-            this.btnTransfer.Click += new System.EventHandler(this.btnTransfer_Click);
-            // 
-            // rtbLogs
-            // 
-            this.rtbLogs.Location = new System.Drawing.Point(19, 262);
-            this.rtbLogs.Name = "rtbLogs";
-            this.rtbLogs.Size = new System.Drawing.Size(827, 558);
-            this.rtbLogs.TabIndex = 12;
-            this.rtbLogs.Text = "";
-            // 
-            // btnViewFileData
-            // 
-            this.btnViewFileData.BackColor = System.Drawing.Color.LavenderBlush;
-            this.btnViewFileData.Enabled = false;
-            this.btnViewFileData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnViewFileData.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnViewFileData.Location = new System.Drawing.Point(19, 216);
-            this.btnViewFileData.Name = "btnViewFileData";
-            this.btnViewFileData.Size = new System.Drawing.Size(170, 37);
-            this.btnViewFileData.TabIndex = 13;
-            this.btnViewFileData.Text = "View File Data";
-            this.btnViewFileData.UseVisualStyleBackColor = false;
-            this.btnViewFileData.Click += new System.EventHandler(this.btnViewFileData_Click);
             // 
             // btnVisibleKey
             // 
             this.btnVisibleKey.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.btnVisibleKey.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.btnVisibleKey.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnVisibleKey.Location = new System.Drawing.Point(793, 51);
+            this.btnVisibleKey.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold);
+            this.btnVisibleKey.Location = new System.Drawing.Point(760, 45);
             this.btnVisibleKey.Name = "btnVisibleKey";
-            this.btnVisibleKey.Size = new System.Drawing.Size(53, 56);
+            this.btnVisibleKey.Size = new System.Drawing.Size(50, 52);
             this.btnVisibleKey.TabIndex = 14;
+            this.btnVisibleKey.Text = "👁️";
             this.btnVisibleKey.UseVisualStyleBackColor = false;
             this.btnVisibleKey.Click += new System.EventHandler(this.btnVisibleKey_Click);
-            // 
-            // btnTransferStop
-            // 
-            this.btnTransferStop.BackColor = System.Drawing.Color.Red;
-            this.btnTransferStop.Enabled = false;
-            this.btnTransferStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTransferStop.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnTransferStop.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnTransferStop.Location = new System.Drawing.Point(560, 826);
-            this.btnTransferStop.Name = "btnTransferStop";
-            this.btnTransferStop.Size = new System.Drawing.Size(120, 42);
-            this.btnTransferStop.TabIndex = 15;
-            this.btnTransferStop.Text = "STOP";
-            this.btnTransferStop.UseVisualStyleBackColor = false;
-            this.btnTransferStop.Click += new System.EventHandler(this.btnTransferStop_Click);
-            // 
-            // btnDownloadCsvTemplate
-            // 
-            this.btnDownloadCsvTemplate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnDownloadCsvTemplate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDownloadCsvTemplate.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDownloadCsvTemplate.Location = new System.Drawing.Point(347, 216);
-            this.btnDownloadCsvTemplate.Name = "btnDownloadCsvTemplate";
-            this.btnDownloadCsvTemplate.Size = new System.Drawing.Size(175, 37);
-            this.btnDownloadCsvTemplate.TabIndex = 16;
-            this.btnDownloadCsvTemplate.Text = "Download Template";
-            this.btnDownloadCsvTemplate.UseVisualStyleBackColor = false;
-            this.btnDownloadCsvTemplate.Click += new System.EventHandler(this.btnDownloadCsvTemplate_Click);
             // 
             // btnFillKeysFromCsv
             // 
             this.btnFillKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.btnFillKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFillKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnFillKeysFromCsv.Location = new System.Drawing.Point(19, 11);
+            this.btnFillKeysFromCsv.Location = new System.Drawing.Point(20, 180);
             this.btnFillKeysFromCsv.Name = "btnFillKeysFromCsv";
             this.btnFillKeysFromCsv.Size = new System.Drawing.Size(170, 37);
             this.btnFillKeysFromCsv.TabIndex = 17;
@@ -249,7 +174,7 @@
             this.btnKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 11);
+            this.btnKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 180);
             this.btnKeysCsvTemplateDownload.Name = "btnKeysCsvTemplateDownload";
             this.btnKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
             this.btnKeysCsvTemplateDownload.TabIndex = 18;
@@ -257,40 +182,283 @@
             this.btnKeysCsvTemplateDownload.UseVisualStyleBackColor = false;
             this.btnKeysCsvTemplateDownload.Click += new System.EventHandler(this.btnKeysCsvTemplateDownload_Click);
             // 
+            // txtAzureConnectionString
+            // 
+            this.txtAzureConnectionString.Location = new System.Drawing.Point(160, 45);
+            this.txtAzureConnectionString.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAzureConnectionString.Name = "txtAzureConnectionString";
+            this.txtAzureConnectionString.PasswordChar = '*';
+            this.txtAzureConnectionString.Size = new System.Drawing.Size(590, 22);
+            this.txtAzureConnectionString.TabIndex = 0;
+            // 
+            // lblAzureConnectionString
+            // 
+            this.lblAzureConnectionString.AutoSize = true;
+            this.lblAzureConnectionString.Location = new System.Drawing.Point(20, 48);
+            this.lblAzureConnectionString.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblAzureConnectionString.Name = "lblAzureConnectionString";
+            this.lblAzureConnectionString.Size = new System.Drawing.Size(111, 16);
+            this.lblAzureConnectionString.TabIndex = 1;
+            this.lblAzureConnectionString.Text = "Connection String";
+            // 
+            // lblAzureContainerName
+            // 
+            this.lblAzureContainerName.AutoSize = true;
+            this.lblAzureContainerName.Location = new System.Drawing.Point(20, 78);
+            this.lblAzureContainerName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblAzureContainerName.Name = "lblAzureContainerName";
+            this.lblAzureContainerName.Size = new System.Drawing.Size(104, 16);
+            this.lblAzureContainerName.TabIndex = 3;
+            this.lblAzureContainerName.Text = "Container Name";
+            // 
+            // txtAzureContainerName
+            // 
+            this.txtAzureContainerName.Location = new System.Drawing.Point(160, 75);
+            this.txtAzureContainerName.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAzureContainerName.Name = "txtAzureContainerName";
+            this.txtAzureContainerName.Size = new System.Drawing.Size(590, 22);
+            this.txtAzureContainerName.TabIndex = 2;
+            // 
+            // btnAzureVisibleKey
+            // 
+            this.btnAzureVisibleKey.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btnAzureVisibleKey.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.btnAzureVisibleKey.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnAzureVisibleKey.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold);
+            this.btnAzureVisibleKey.Location = new System.Drawing.Point(760, 45);
+            this.btnAzureVisibleKey.Name = "btnAzureVisibleKey";
+            this.btnAzureVisibleKey.Size = new System.Drawing.Size(50, 52);
+            this.btnAzureVisibleKey.TabIndex = 14;
+            this.btnAzureVisibleKey.Text = "👁️";
+            this.btnAzureVisibleKey.UseVisualStyleBackColor = false;
+            this.btnAzureVisibleKey.Click += new System.EventHandler(this.btnAzureVisibleKey_Click);
+            // 
+            // btnFillAzureKeysFromCsv
+            // 
+            this.btnFillAzureKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.btnFillAzureKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFillAzureKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 120);
+            this.btnFillAzureKeysFromCsv.Name = "btnFillAzureKeysFromCsv";
+            this.btnFillAzureKeysFromCsv.Size = new System.Drawing.Size(170, 37);
+            this.btnFillAzureKeysFromCsv.TabIndex = 17;
+            this.btnFillAzureKeysFromCsv.Text = "Fill Keys From Csv";
+            this.btnFillAzureKeysFromCsv.UseVisualStyleBackColor = false;
+            this.btnFillAzureKeysFromCsv.Click += new System.EventHandler(this.btnFillAzureKeysFromCsv_Click);
+            // 
+            // btnAzureKeysCsvTemplateDownload
+            // 
+            this.btnAzureKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAzureKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAzureKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 120);
+            this.btnAzureKeysCsvTemplateDownload.Name = "btnAzureKeysCsvTemplateDownload";
+            this.btnAzureKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
+            this.btnAzureKeysCsvTemplateDownload.TabIndex = 18;
+            this.btnAzureKeysCsvTemplateDownload.Text = "Download Keys Template";
+            this.btnAzureKeysCsvTemplateDownload.UseVisualStyleBackColor = false;
+            this.btnAzureKeysCsvTemplateDownload.Click += new System.EventHandler(this.btnAzureKeysCsvTemplateDownload_Click);
+            // 
+            // lblCsvPath
+            // 
+            this.lblCsvPath.AutoSize = true;
+            this.lblCsvPath.Location = new System.Drawing.Point(20, 50);
+            this.lblCsvPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblCsvPath.Name = "lblCsvPath";
+            this.lblCsvPath.Size = new System.Drawing.Size(34, 16);
+            this.lblCsvPath.TabIndex = 9;
+            this.lblCsvPath.Text = "Path";
+            // 
+            // txtCsvPath
+            // 
+            this.txtCsvPath.Location = new System.Drawing.Point(100, 47);
+            this.txtCsvPath.Margin = new System.Windows.Forms.Padding(4);
+            this.txtCsvPath.Name = "txtCsvPath";
+            this.txtCsvPath.ReadOnly = true;
+            this.txtCsvPath.Size = new System.Drawing.Size(700, 22);
+            this.txtCsvPath.TabIndex = 8;
+            // 
+            // btnSelectCsv
+            // 
+            this.btnSelectCsv.BackColor = System.Drawing.Color.PeachPuff;
+            this.btnSelectCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSelectCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnSelectCsv.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnSelectCsv.Location = new System.Drawing.Point(640, 100);
+            this.btnSelectCsv.Name = "btnSelectCsv";
+            this.btnSelectCsv.Size = new System.Drawing.Size(160, 37);
+            this.btnSelectCsv.TabIndex = 10;
+            this.btnSelectCsv.Text = "File Upload";
+            this.btnSelectCsv.UseVisualStyleBackColor = false;
+            this.btnSelectCsv.Click += new System.EventHandler(this.btnSelectCsv_Click);
+            // 
+            // btnViewFileData
+            // 
+            this.btnViewFileData.BackColor = System.Drawing.Color.LavenderBlush;
+            this.btnViewFileData.Enabled = false;
+            this.btnViewFileData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnViewFileData.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnViewFileData.Location = new System.Drawing.Point(100, 100);
+            this.btnViewFileData.Name = "btnViewFileData";
+            this.btnViewFileData.Size = new System.Drawing.Size(170, 37);
+            this.btnViewFileData.TabIndex = 13;
+            this.btnViewFileData.Text = "View File Data";
+            this.btnViewFileData.UseVisualStyleBackColor = false;
+            this.btnViewFileData.Click += new System.EventHandler(this.btnViewFileData_Click);
+            // 
+            // btnDownloadCsvTemplate
+            // 
+            this.btnDownloadCsvTemplate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnDownloadCsvTemplate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDownloadCsvTemplate.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDownloadCsvTemplate.Location = new System.Drawing.Point(359, 100);
+            this.btnDownloadCsvTemplate.Name = "btnDownloadCsvTemplate";
+            this.btnDownloadCsvTemplate.Size = new System.Drawing.Size(175, 37);
+            this.btnDownloadCsvTemplate.TabIndex = 16;
+            this.btnDownloadCsvTemplate.Text = "Download Template";
+            this.btnDownloadCsvTemplate.UseVisualStyleBackColor = false;
+            this.btnDownloadCsvTemplate.Click += new System.EventHandler(this.btnDownloadCsvTemplate_Click);
+            // 
+            // btnTransfer
+            // 
+            this.btnTransfer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.btnTransfer.Enabled = false;
+            this.btnTransfer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTransfer.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnTransfer.ForeColor = System.Drawing.Color.Green;
+            this.btnTransfer.Location = new System.Drawing.Point(650, 780);
+            this.btnTransfer.Name = "btnTransfer";
+            this.btnTransfer.Size = new System.Drawing.Size(160, 42);
+            this.btnTransfer.TabIndex = 11;
+            this.btnTransfer.Text = "TRANSFER";
+            this.btnTransfer.UseVisualStyleBackColor = false;
+            this.btnTransfer.Click += new System.EventHandler(this.btnTransfer_Click);
+            // 
+            // rtbLogs
+            // 
+            this.rtbLogs.Location = new System.Drawing.Point(10, 10);
+            this.rtbLogs.Name = "rtbLogs";
+            this.rtbLogs.Size = new System.Drawing.Size(800, 760);
+            this.rtbLogs.TabIndex = 12;
+            this.rtbLogs.Text = "";
+            // 
+            // btnTransferStop
+            // 
+            this.btnTransferStop.BackColor = System.Drawing.Color.Red;
+            this.btnTransferStop.Enabled = false;
+            this.btnTransferStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTransferStop.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnTransferStop.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.btnTransferStop.Location = new System.Drawing.Point(520, 780);
+            this.btnTransferStop.Name = "btnTransferStop";
+            this.btnTransferStop.Size = new System.Drawing.Size(120, 42);
+            this.btnTransferStop.TabIndex = 15;
+            this.btnTransferStop.Text = "STOP";
+            this.btnTransferStop.UseVisualStyleBackColor = false;
+            this.btnTransferStop.Click += new System.EventHandler(this.btnTransferStop_Click);
+            // 
+            // tabControl
+            // 
+            this.tabControl.Controls.Add(this.tabPageAWS);
+            this.tabControl.Controls.Add(this.tabPageAzure);
+            this.tabControl.Controls.Add(this.tabPageFile);
+            this.tabControl.Controls.Add(this.tabPageTransfer);
+            this.tabControl.Location = new System.Drawing.Point(12, 12);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(834, 857);
+            this.tabControl.TabIndex = 19;
+            // 
+            // tabPageAWS
+            // 
+            this.tabPageAWS.Controls.Add(this.btnKeysCsvTemplateDownload);
+            this.tabPageAWS.Controls.Add(this.btnFillKeysFromCsv);
+            this.tabPageAWS.Controls.Add(this.btnVisibleKey);
+            this.tabPageAWS.Controls.Add(this.lblAccessKey);
+            this.tabPageAWS.Controls.Add(this.txtAccessKey);
+            this.tabPageAWS.Controls.Add(this.lblSecretKey);
+            this.tabPageAWS.Controls.Add(this.txtSecretKey);
+            this.tabPageAWS.Controls.Add(this.lblRegion);
+            this.tabPageAWS.Controls.Add(this.txtRegion);
+            this.tabPageAWS.Controls.Add(this.lblBucketName);
+            this.tabPageAWS.Controls.Add(this.txtBucketName);
+            this.tabPageAWS.Location = new System.Drawing.Point(4, 25);
+            this.tabPageAWS.Name = "tabPageAWS";
+            this.tabPageAWS.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageAWS.Size = new System.Drawing.Size(826, 828);
+            this.tabPageAWS.TabIndex = 1;
+            this.tabPageAWS.Text = "AWS S3";
+            this.tabPageAWS.UseVisualStyleBackColor = true;
+            // 
+            // tabPageAzure
+            // 
+            this.tabPageAzure.Controls.Add(this.btnAzureKeysCsvTemplateDownload);
+            this.tabPageAzure.Controls.Add(this.btnFillAzureKeysFromCsv);
+            this.tabPageAzure.Controls.Add(this.btnAzureVisibleKey);
+            this.tabPageAzure.Controls.Add(this.lblAzureConnectionString);
+            this.tabPageAzure.Controls.Add(this.txtAzureConnectionString);
+            this.tabPageAzure.Controls.Add(this.lblAzureContainerName);
+            this.tabPageAzure.Controls.Add(this.txtAzureContainerName);
+            this.tabPageAzure.Location = new System.Drawing.Point(4, 25);
+            this.tabPageAzure.Name = "tabPageAzure";
+            this.tabPageAzure.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageAzure.Size = new System.Drawing.Size(826, 828);
+            this.tabPageAzure.TabIndex = 2;
+            this.tabPageAzure.Text = "Azure Blob";
+            this.tabPageAzure.UseVisualStyleBackColor = true;
+            // 
+            // tabPageFile
+            // 
+            this.tabPageFile.Controls.Add(this.btnDownloadCsvTemplate);
+            this.tabPageFile.Controls.Add(this.btnSelectCsv);
+            this.tabPageFile.Controls.Add(this.btnViewFileData);
+            this.tabPageFile.Controls.Add(this.lblCsvPath);
+            this.tabPageFile.Controls.Add(this.txtCsvPath);
+            this.tabPageFile.Location = new System.Drawing.Point(4, 25);
+            this.tabPageFile.Name = "tabPageFile";
+            this.tabPageFile.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageFile.Size = new System.Drawing.Size(826, 828);
+            this.tabPageFile.TabIndex = 3;
+            this.tabPageFile.Text = "Dosya İşlemleri";
+            this.tabPageFile.UseVisualStyleBackColor = true;
+            // 
+            // tabPageTransfer
+            // 
+            this.tabPageTransfer.Controls.Add(this.rtbLogs);
+            this.tabPageTransfer.Controls.Add(this.btnTransfer);
+            this.tabPageTransfer.Controls.Add(this.btnTransferStop);
+            this.tabPageTransfer.Location = new System.Drawing.Point(4, 25);
+            this.tabPageTransfer.Name = "tabPageTransfer";
+            this.tabPageTransfer.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageTransfer.Size = new System.Drawing.Size(826, 828);
+            this.tabPageTransfer.TabIndex = 4;
+            this.tabPageTransfer.Text = "Transfer";
+            this.tabPageTransfer.UseVisualStyleBackColor = true;
+            // 
             // CsvToS3Uploader
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(858, 881);
-            this.Controls.Add(this.btnKeysCsvTemplateDownload);
-            this.Controls.Add(this.btnFillKeysFromCsv);
-            this.Controls.Add(this.btnDownloadCsvTemplate);
-            this.Controls.Add(this.btnTransferStop);
-            this.Controls.Add(this.btnVisibleKey);
-            this.Controls.Add(this.btnViewFileData);
-            this.Controls.Add(this.rtbLogs);
-            this.Controls.Add(this.btnTransfer);
-            this.Controls.Add(this.btnSelectCsv);
-            this.Controls.Add(this.lblCsvPath);
-            this.Controls.Add(this.txtCsvPath);
-            this.Controls.Add(this.lblBucketName);
-            this.Controls.Add(this.txtBucketName);
-            this.Controls.Add(this.lblRegion);
-            this.Controls.Add(this.txtRegion);
-            this.Controls.Add(this.lblSecretKey);
-            this.Controls.Add(this.txtSecretKey);
-            this.Controls.Add(this.lblAccessKey);
-            this.Controls.Add(this.txtAccessKey);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ClientSize = new System.Drawing.Size(861, 881);
+            this.Controls.Add(this.tabControl);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CsvToS3Uploader";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CsvToS3Uploader";
+            this.Text = "Multi Cloud Media Uploader";
+            this.tabControl.ResumeLayout(false);
+            this.tabPageAWS.ResumeLayout(false);
+            this.tabPageAWS.PerformLayout();
+            this.tabPageAzure.ResumeLayout(false);
+            this.tabPageAzure.PerformLayout();
+            this.tabPageFile.ResumeLayout(false);
+            this.tabPageFile.PerformLayout();
+            this.tabPageTransfer.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
+
 
         #endregion
 
@@ -313,6 +481,22 @@
         private System.Windows.Forms.Button btnDownloadCsvTemplate;
         private System.Windows.Forms.Button btnFillKeysFromCsv;
         private System.Windows.Forms.Button btnKeysCsvTemplateDownload;
+
+        // Azure için yeni kontroller
+        private System.Windows.Forms.TextBox txtAzureConnectionString;
+        private System.Windows.Forms.Label lblAzureConnectionString;
+        private System.Windows.Forms.Label lblAzureContainerName;
+        private System.Windows.Forms.TextBox txtAzureContainerName;
+        private System.Windows.Forms.Button btnAzureVisibleKey;
+        private System.Windows.Forms.Button btnFillAzureKeysFromCsv;
+        private System.Windows.Forms.Button btnAzureKeysCsvTemplateDownload;
+
+        // Tab kontrolü
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.TabPage tabPageAWS;
+        private System.Windows.Forms.TabPage tabPageAzure;
+        private System.Windows.Forms.TabPage tabPageFile;
+        private System.Windows.Forms.TabPage tabPageTransfer;
     }
 }
 
