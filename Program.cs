@@ -15,6 +15,10 @@ namespace TransferMediaCsvToS3App
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += (sender, args) => ShowError(args.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+                ShowError(args.ExceptionObject as Exception);
 
             bool isAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent())
             .IsInRole(WindowsBuiltInRole.Administrator);
@@ -28,7 +32,9 @@ namespace TransferMediaCsvToS3App
                     startInfo.WorkingDirectory = Environment.CurrentDirectory;
                     startInfo.FileName = Application.ExecutablePath;
                     startInfo.Verb = "runas";
-                    Process.Start(startInfo);
+
+                    Process adminProcess = Process.Start(startInfo);
+                    Application.Exit();
                     return;
                 }
                 catch (Exception ex)
@@ -41,5 +47,12 @@ namespace TransferMediaCsvToS3App
 
             Application.Run(new MultiCloudUploaderForm());
         }
+
+        private static void ShowError(Exception ex)
+        {
+            MessageBox.Show($"Kritik hata: {ex?.ToString()}", "Çökme", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Environment.Exit(1);
+        }
     }
+
 }

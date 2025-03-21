@@ -1,7 +1,6 @@
 ﻿using CsvHelper;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,16 +31,19 @@ namespace TransferMediaCsvToS3App
         private StorageProvider currentProvider = StorageProvider.None;
         public MultiCloudUploaderForm()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            tabControl.TabPages.Remove(tabPageAWS);
-            tabControl.TabPages.Remove(tabPageAzure);
-            tabControl.TabPages.Remove(tabPageFile);
-            tabControl.TabPages.Remove(tabPageTransfer);
-            tabControl.TabPages.Add(tabPageProviderSelection);
-
-            tabControl.SelectedTab = tabPageProviderSelection;
-            this.btnTransfer.Click += new System.EventHandler(this.btnTransfer_Click);
+                tabControl.TabPages.Clear();
+                tabControl.TabPages.Add(tabPageProviderSelection);
+                tabControl.SelectedTab = tabPageProviderSelection;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Form başlatılamadı: {ex.ToString()}");
+                Environment.Exit(1);
+            }
         }
         private void btnSelectCsv_Click(object sender, EventArgs e)
         {
@@ -85,7 +87,8 @@ namespace TransferMediaCsvToS3App
         {
             isAzureKeysVisible = !isAzureKeysVisible;
 
-            txtAzureConnectionString.PasswordChar = isAzureKeysVisible ? '\0' : '*';
+            txtAzureBlobUrl.PasswordChar = isAzureKeysVisible ? '\0' : '*';
+            txtAzureSasToken.PasswordChar = isAzureKeysVisible ? '\0' : '*';
 
             btnAzureVisibleKey.Text = isAzureKeysVisible ? "🔒" : "👁️";
         }
@@ -105,7 +108,7 @@ namespace TransferMediaCsvToS3App
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine($"Transfer initiated. Current Provider: {currentProvider}");
+                Log(0, $"Transfer initiated. Current Provider: {currentProvider}");
 
                 if (currentProvider == StorageProvider.None)
                 {
@@ -116,6 +119,7 @@ namespace TransferMediaCsvToS3App
 
                 _cancellationTokenSource = new CancellationTokenSource();
                 btnTransferStop.Enabled = true;
+                btnClearLog.Enabled = false;
 
                 if (currentProvider == StorageProvider.AwsS3)
                 {
@@ -129,6 +133,7 @@ namespace TransferMediaCsvToS3App
             catch (OperationCanceledException)
             {
                 MessageBox.Show("Transfer operation was stopped by the user!", "Process Stopped", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Log(0, "Transfer operation was stopped by the user!");
             }
             catch (Exception ex)
             {
@@ -137,6 +142,7 @@ namespace TransferMediaCsvToS3App
             finally
             {
                 btnTransferStop.Enabled = false;
+                btnClearLog.Enabled = true;
             }
         }
 
@@ -175,6 +181,8 @@ namespace TransferMediaCsvToS3App
 
                 if (!exists)
                 {
+                    string contentType = GetContentTypeFromFileName(fileName);
+
                     await awsService.UploadFileAsync(fileName, fileStream, _cancellationTokenSource.Token);
                     Log(record.RowNumber, $"Uploaded: {fileName}");
                 }
@@ -188,7 +196,8 @@ namespace TransferMediaCsvToS3App
         private async Task TransferToAzureBlob()
         {
             string csvPath = txtCsvPath.Text;
-            string connectionString = txtAzureConnectionString.Text;
+            string blobUrl = txtAzureBlobUrl.Text;
+            string sasToken = txtAzureSasToken.Text;
             string containerName = txtAzureContainerName.Text;
             string folderPath = txtAzureFolderPath.Text;
 
@@ -197,18 +206,20 @@ namespace TransferMediaCsvToS3App
                 folderPath += "/";
             }
 
-            if (string.IsNullOrEmpty(csvPath) || string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(containerName))
+            if (string.IsNullOrEmpty(csvPath) || string.IsNullOrEmpty(blobUrl) ||
+       string.IsNullOrEmpty(sasToken) || string.IsNullOrEmpty(containerName))
             {
                 MessageBox.Show("Please fill in all fields for Azure connection!", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var azureService = new AzureBlobStorageService(connectionString, containerName, folderPath);
+            var azureService = new AzureBlobStorageService(blobUrl, sasToken, containerName, folderPath);
 
-            if (!await azureService.ValidateConnectionAsync())
-            {
-                return;
-            }
+            //if (!await azureService.ValidateConnectionAsync())
+            //{
+            //    MessageBox.Show("Failed to connect to Azure Blob with the entered information. Please check your information!!", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
 
             await ProcessCsvAndUpload(csvPath, async (record, fileStream, fileName) =>
             {
@@ -216,14 +227,24 @@ namespace TransferMediaCsvToS3App
 
                 if (!exists)
                 {
-                    await azureService.UploadBlobAsync(fileName, fileStream, null, _cancellationTokenSource.Token);
+                    string contentType = GetContentTypeFromFileName(fileName);
+
+                    if (string.IsNullOrEmpty(contentType))
+                    {
+                        await azureService.UploadBlobAsync(fileName, fileStream, null, _cancellationTokenSource.Token);
+                    }
+                    else
+                    {
+                        await azureService.UploadBlobWithContentTypeAsync(fileName, fileStream, contentType, _cancellationTokenSource.Token);
+                    }
+
                     Log(record.RowNumber, $"Uploaded: {fileName}");
                 }
                 else
                 {
                     Log(record.RowNumber, $"Skipped (Exists): {fileName}");
                 }
-            }, chkAwsOnlyLatestMedia.Checked);
+            }, chkAzureOnlyLatestMedia.Checked);
         }
 
         private async Task ProcessCsvAndUpload(string csvPath, Func<CsvRecordModel, Stream, string, Task> uploadAction, bool onlyLatestRecords = false)
@@ -442,9 +463,10 @@ namespace TransferMediaCsvToS3App
         {
             LoadKeysFromCsv((keys) =>
             {
-                if (keys.ContainsKey("connection_string") && keys.ContainsKey("container_name"))
+                if (keys.ContainsKey("blob_url") && keys.ContainsKey("sas_token") && keys.ContainsKey("container_name"))
                 {
-                    txtAzureConnectionString.Text = keys["connection_string"];
+                    txtAzureBlobUrl.Text = keys["blob_url"];
+                    txtAzureSasToken.Text = keys["sas_token"];
                     txtAzureContainerName.Text = keys["container_name"];
 
                     if (keys.ContainsKey("folder_path"))
@@ -460,7 +482,7 @@ namespace TransferMediaCsvToS3App
 
         private void btnAzureKeysCsvTemplateDownload_Click(object sender, EventArgs e)
         {
-            string azureTemplate = "connection_string,container_name,folder_path\n";
+            string azureTemplate = "blob_url,sas_token,container_name,folder_path\n";
             DownloadKeysTemplate("azure_keys_template.csv", azureTemplate, "Azure Blob");
         }
 
@@ -581,6 +603,39 @@ namespace TransferMediaCsvToS3App
             {
                 MessageBox.Show($"Error writing to log file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private string GetContentTypeFromFileName(string fileName)
+        {
+            string extension = Path.GetExtension(fileName).ToLower();
+
+            switch (extension)
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+                case ".png":
+                    return "image/png";
+                case ".gif":
+                    return "image/gif";
+                case ".bmp":
+                    return "image/bmp";
+                case ".mp4":
+                    return "video/mp4";
+                case ".avi":
+                    return "video/x-msvideo";
+                case ".mov":
+                    return "video/quicktime";
+                case ".pdf":
+                    return "application/pdf";
+                default:
+                    return "application/octet-stream";
+            }
+        }
+
+        private void btnClearLog_Click(object sender, EventArgs e)
+        {
+            rtbLogs.Clear();
         }
     }
 }

@@ -41,8 +41,10 @@
             this.btnVisibleKey = new System.Windows.Forms.Button();
             this.btnFillKeysFromCsv = new System.Windows.Forms.Button();
             this.btnKeysCsvTemplateDownload = new System.Windows.Forms.Button();
-            this.txtAzureConnectionString = new System.Windows.Forms.TextBox();
-            this.lblAzureConnectionString = new System.Windows.Forms.Label();
+            this.txtAzureBlobUrl = new System.Windows.Forms.TextBox();
+            this.lblAzureBlobUrl = new System.Windows.Forms.Label();
+            this.txtAzureSasToken = new System.Windows.Forms.TextBox();
+            this.lblAzureSasToken = new System.Windows.Forms.Label();
             this.lblAzureContainerName = new System.Windows.Forms.Label();
             this.txtAzureContainerName = new System.Windows.Forms.TextBox();
             this.btnAzureVisibleKey = new System.Windows.Forms.Button();
@@ -61,21 +63,21 @@
             this.tabPageAzure = new System.Windows.Forms.TabPage();
             this.lblAzureFolderPath = new System.Windows.Forms.Label();
             this.txtAzureFolderPath = new System.Windows.Forms.TextBox();
+            this.tabPageFile = new System.Windows.Forms.TabPage();
+            this.tabPageTransfer = new System.Windows.Forms.TabPage();
             this.rbAwsS3 = new System.Windows.Forms.RadioButton();
             this.rbAzureBlob = new System.Windows.Forms.RadioButton();
             this.lblProviderSelection = new System.Windows.Forms.Label();
             this.btnSelectProvider = new System.Windows.Forms.Button();
-            this.tabPageFile = new System.Windows.Forms.TabPage();
-            this.tabPageTransfer = new System.Windows.Forms.TabPage();
             this.tabPageProviderSelection = new System.Windows.Forms.TabPage();
-            this.tabPageProviderSelection.SuspendLayout();
+            this.btnClearLog = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPageAWS.SuspendLayout();
             this.tabPageAzure.SuspendLayout();
             this.tabPageFile.SuspendLayout();
             this.tabPageTransfer.SuspendLayout();
+            this.tabPageProviderSelection.SuspendLayout();
             this.SuspendLayout();
-
             // 
             // chkAwsOnlyLatestMedia
             // 
@@ -90,7 +92,7 @@
             // chkAzureOnlyLatestMedia
             // 
             this.chkAzureOnlyLatestMedia.AutoSize = true;
-            this.chkAzureOnlyLatestMedia.Location = new System.Drawing.Point(161, 140);
+            this.chkAzureOnlyLatestMedia.Location = new System.Drawing.Point(161, 170);
             this.chkAzureOnlyLatestMedia.Name = "chkAzureOnlyLatestMedia";
             this.chkAzureOnlyLatestMedia.Size = new System.Drawing.Size(184, 20);
             this.chkAzureOnlyLatestMedia.TabIndex = 20;
@@ -211,42 +213,61 @@
             this.btnKeysCsvTemplateDownload.UseVisualStyleBackColor = false;
             this.btnKeysCsvTemplateDownload.Click += new System.EventHandler(this.btnKeysCsvTemplateDownload_Click);
             // 
-            // txtAzureConnectionString
+            // txtAzureBlobUrl
             // 
-            this.txtAzureConnectionString.Location = new System.Drawing.Point(160, 45);
-            this.txtAzureConnectionString.Margin = new System.Windows.Forms.Padding(4);
-            this.txtAzureConnectionString.Name = "txtAzureConnectionString";
-            this.txtAzureConnectionString.PasswordChar = '*';
-            this.txtAzureConnectionString.Size = new System.Drawing.Size(590, 22);
-            this.txtAzureConnectionString.TabIndex = 0;
+            this.txtAzureBlobUrl.Location = new System.Drawing.Point(160, 45);
+            this.txtAzureBlobUrl.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAzureBlobUrl.Name = "txtAzureBlobUrl";
+            this.txtAzureBlobUrl.PasswordChar = '*';
+            this.txtAzureBlobUrl.Size = new System.Drawing.Size(590, 22);
+            this.txtAzureBlobUrl.TabIndex = 0;
             // 
-            // lblAzureConnectionString
+            // lblAzureBlobUrl
             // 
-            this.lblAzureConnectionString.AutoSize = true;
-            this.lblAzureConnectionString.Location = new System.Drawing.Point(20, 48);
-            this.lblAzureConnectionString.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblAzureConnectionString.Name = "lblAzureConnectionString";
-            this.lblAzureConnectionString.Size = new System.Drawing.Size(111, 16);
-            this.lblAzureConnectionString.TabIndex = 1;
-            this.lblAzureConnectionString.Text = "Connection String";
+            this.lblAzureBlobUrl.AutoSize = true;
+            this.lblAzureBlobUrl.Location = new System.Drawing.Point(20, 48);
+            this.lblAzureBlobUrl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblAzureBlobUrl.Name = "lblAzureBlobUrl";
+            this.lblAzureBlobUrl.Size = new System.Drawing.Size(65, 16);
+            this.lblAzureBlobUrl.TabIndex = 1;
+            this.lblAzureBlobUrl.Text = "Blob URL";
+            // 
+            // txtAzureSasToken
+            // 
+            this.txtAzureSasToken.Location = new System.Drawing.Point(160, 75);
+            this.txtAzureSasToken.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAzureSasToken.Name = "txtAzureSasToken";
+            this.txtAzureSasToken.PasswordChar = '*';
+            this.txtAzureSasToken.Size = new System.Drawing.Size(590, 22);
+            this.txtAzureSasToken.TabIndex = 2;
+            // 
+            // lblAzureSasToken
+            // 
+            this.lblAzureSasToken.AutoSize = true;
+            this.lblAzureSasToken.Location = new System.Drawing.Point(20, 78);
+            this.lblAzureSasToken.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblAzureSasToken.Name = "lblAzureSasToken";
+            this.lblAzureSasToken.Size = new System.Drawing.Size(76, 16);
+            this.lblAzureSasToken.TabIndex = 3;
+            this.lblAzureSasToken.Text = "SAS Token";
             // 
             // lblAzureContainerName
             // 
             this.lblAzureContainerName.AutoSize = true;
-            this.lblAzureContainerName.Location = new System.Drawing.Point(20, 78);
+            this.lblAzureContainerName.Location = new System.Drawing.Point(20, 108);
             this.lblAzureContainerName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAzureContainerName.Name = "lblAzureContainerName";
             this.lblAzureContainerName.Size = new System.Drawing.Size(104, 16);
-            this.lblAzureContainerName.TabIndex = 3;
+            this.lblAzureContainerName.TabIndex = 5;
             this.lblAzureContainerName.Text = "Container Name";
             // 
             // txtAzureContainerName
             // 
-            this.txtAzureContainerName.Location = new System.Drawing.Point(160, 75);
+            this.txtAzureContainerName.Location = new System.Drawing.Point(160, 105);
             this.txtAzureContainerName.Margin = new System.Windows.Forms.Padding(4);
             this.txtAzureContainerName.Name = "txtAzureContainerName";
-            this.txtAzureContainerName.Size = new System.Drawing.Size(590, 22);
-            this.txtAzureContainerName.TabIndex = 2;
+            this.txtAzureContainerName.Size = new System.Drawing.Size(650, 22);
+            this.txtAzureContainerName.TabIndex = 4;
             // 
             // btnAzureVisibleKey
             // 
@@ -254,9 +275,9 @@
             this.btnAzureVisibleKey.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.btnAzureVisibleKey.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnAzureVisibleKey.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold);
-            this.btnAzureVisibleKey.Location = new System.Drawing.Point(760, 45);
+            this.btnAzureVisibleKey.Location = new System.Drawing.Point(757, 45);
             this.btnAzureVisibleKey.Name = "btnAzureVisibleKey";
-            this.btnAzureVisibleKey.Size = new System.Drawing.Size(50, 52);
+            this.btnAzureVisibleKey.Size = new System.Drawing.Size(53, 52);
             this.btnAzureVisibleKey.TabIndex = 14;
             this.btnAzureVisibleKey.Text = "👁️";
             this.btnAzureVisibleKey.UseVisualStyleBackColor = false;
@@ -267,7 +288,7 @@
             this.btnFillAzureKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.btnFillAzureKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFillAzureKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 179);
+            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 201);
             this.btnFillAzureKeysFromCsv.Name = "btnFillAzureKeysFromCsv";
             this.btnFillAzureKeysFromCsv.Size = new System.Drawing.Size(170, 37);
             this.btnFillAzureKeysFromCsv.TabIndex = 17;
@@ -280,7 +301,7 @@
             this.btnAzureKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnAzureKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAzureKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 179);
+            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 201);
             this.btnAzureKeysCsvTemplateDownload.Name = "btnAzureKeysCsvTemplateDownload";
             this.btnAzureKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
             this.btnAzureKeysCsvTemplateDownload.TabIndex = 18;
@@ -355,9 +376,9 @@
             this.btnTransfer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTransfer.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
             this.btnTransfer.ForeColor = System.Drawing.Color.Green;
-            this.btnTransfer.Location = new System.Drawing.Point(650, 780);
+            this.btnTransfer.Location = new System.Drawing.Point(650, 669);
             this.btnTransfer.Name = "btnTransfer";
-            this.btnTransfer.Size = new System.Drawing.Size(160, 42);
+            this.btnTransfer.Size = new System.Drawing.Size(159, 42);
             this.btnTransfer.TabIndex = 11;
             this.btnTransfer.Text = "TRANSFER";
             this.btnTransfer.UseVisualStyleBackColor = false;
@@ -367,7 +388,7 @@
             // 
             this.rtbLogs.Location = new System.Drawing.Point(10, 10);
             this.rtbLogs.Name = "rtbLogs";
-            this.rtbLogs.Size = new System.Drawing.Size(800, 760);
+            this.rtbLogs.Size = new System.Drawing.Size(800, 650);
             this.rtbLogs.TabIndex = 12;
             this.rtbLogs.Text = "";
             // 
@@ -378,9 +399,9 @@
             this.btnTransferStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTransferStop.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
             this.btnTransferStop.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnTransferStop.Location = new System.Drawing.Point(520, 780);
+            this.btnTransferStop.Location = new System.Drawing.Point(519, 669);
             this.btnTransferStop.Name = "btnTransferStop";
-            this.btnTransferStop.Size = new System.Drawing.Size(120, 42);
+            this.btnTransferStop.Size = new System.Drawing.Size(116, 42);
             this.btnTransferStop.TabIndex = 15;
             this.btnTransferStop.Text = "STOP";
             this.btnTransferStop.UseVisualStyleBackColor = false;
@@ -395,7 +416,7 @@
             this.tabControl.Location = new System.Drawing.Point(12, 12);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(834, 857);
+            this.tabControl.Size = new System.Drawing.Size(825, 751);
             this.tabControl.TabIndex = 19;
             // 
             // tabPageAWS
@@ -415,7 +436,7 @@
             this.tabPageAWS.Location = new System.Drawing.Point(4, 25);
             this.tabPageAWS.Name = "tabPageAWS";
             this.tabPageAWS.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAWS.Size = new System.Drawing.Size(826, 828);
+            this.tabPageAWS.Size = new System.Drawing.Size(817, 722);
             this.tabPageAWS.TabIndex = 1;
             this.tabPageAWS.Text = "AWS S3";
             this.tabPageAWS.UseVisualStyleBackColor = true;
@@ -425,8 +446,10 @@
             this.tabPageAzure.Controls.Add(this.btnAzureKeysCsvTemplateDownload);
             this.tabPageAzure.Controls.Add(this.btnFillAzureKeysFromCsv);
             this.tabPageAzure.Controls.Add(this.btnAzureVisibleKey);
-            this.tabPageAzure.Controls.Add(this.lblAzureConnectionString);
-            this.tabPageAzure.Controls.Add(this.txtAzureConnectionString);
+            this.tabPageAzure.Controls.Add(this.lblAzureBlobUrl);
+            this.tabPageAzure.Controls.Add(this.txtAzureBlobUrl);
+            this.tabPageAzure.Controls.Add(this.lblAzureSasToken);
+            this.tabPageAzure.Controls.Add(this.txtAzureSasToken);
             this.tabPageAzure.Controls.Add(this.lblAzureContainerName);
             this.tabPageAzure.Controls.Add(this.txtAzureContainerName);
             this.tabPageAzure.Controls.Add(this.chkAzureOnlyLatestMedia);
@@ -435,7 +458,7 @@
             this.tabPageAzure.Location = new System.Drawing.Point(4, 25);
             this.tabPageAzure.Name = "tabPageAzure";
             this.tabPageAzure.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAzure.Size = new System.Drawing.Size(826, 828);
+            this.tabPageAzure.Size = new System.Drawing.Size(817, 722);
             this.tabPageAzure.TabIndex = 2;
             this.tabPageAzure.Text = "Azure Blob";
             this.tabPageAzure.UseVisualStyleBackColor = true;
@@ -443,39 +466,73 @@
             // lblAzureFolderPath
             // 
             this.lblAzureFolderPath.AutoSize = true;
-            this.lblAzureFolderPath.Location = new System.Drawing.Point(20, 108);
+            this.lblAzureFolderPath.Location = new System.Drawing.Point(20, 138);
             this.lblAzureFolderPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAzureFolderPath.Name = "lblAzureFolderPath";
             this.lblAzureFolderPath.Size = new System.Drawing.Size(76, 16);
-            this.lblAzureFolderPath.TabIndex = 5;
+            this.lblAzureFolderPath.TabIndex = 7;
             this.lblAzureFolderPath.Text = "Folder Path";
-
+            // 
+            // txtAzureFolderPath
+            // 
+            this.txtAzureFolderPath.Location = new System.Drawing.Point(160, 135);
+            this.txtAzureFolderPath.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAzureFolderPath.Name = "txtAzureFolderPath";
+            this.txtAzureFolderPath.Size = new System.Drawing.Size(650, 22);
+            this.txtAzureFolderPath.TabIndex = 8;
+            // 
+            // tabPageFile
+            // 
+            this.tabPageFile.Controls.Add(this.btnDownloadCsvTemplate);
+            this.tabPageFile.Controls.Add(this.btnSelectCsv);
+            this.tabPageFile.Controls.Add(this.btnViewFileData);
+            this.tabPageFile.Controls.Add(this.lblCsvPath);
+            this.tabPageFile.Controls.Add(this.txtCsvPath);
+            this.tabPageFile.Location = new System.Drawing.Point(4, 25);
+            this.tabPageFile.Name = "tabPageFile";
+            this.tabPageFile.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageFile.Size = new System.Drawing.Size(817, 722);
+            this.tabPageFile.TabIndex = 3;
+            this.tabPageFile.Text = "Dosya İşlemleri";
+            this.tabPageFile.UseVisualStyleBackColor = true;
+            // 
+            // tabPageTransfer
+            // 
+            this.tabPageTransfer.Controls.Add(this.rtbLogs);
+            this.tabPageTransfer.Controls.Add(this.btnTransfer);
+            this.tabPageTransfer.Controls.Add(this.btnClearLog);
+            this.tabPageTransfer.Controls.Add(this.btnTransferStop);
+            this.tabPageTransfer.Location = new System.Drawing.Point(4, 25);
+            this.tabPageTransfer.Name = "tabPageTransfer";
+            this.tabPageTransfer.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageTransfer.Size = new System.Drawing.Size(817, 722);
+            this.tabPageTransfer.TabIndex = 4;
+            this.tabPageTransfer.Text = "Transfer";
+            this.tabPageTransfer.UseVisualStyleBackColor = true;
             // 
             // rbAwsS3
             // 
             this.rbAwsS3.AutoSize = true;
             this.rbAwsS3.Location = new System.Drawing.Point(300, 300);
             this.rbAwsS3.Name = "rbAwsS3";
-            this.rbAwsS3.Size = new System.Drawing.Size(200, 21);
+            this.rbAwsS3.Size = new System.Drawing.Size(78, 20);
             this.rbAwsS3.TabIndex = 0;
             this.rbAwsS3.TabStop = true;
             this.rbAwsS3.Text = "AWS S3";
             this.rbAwsS3.UseVisualStyleBackColor = true;
             this.rbAwsS3.CheckedChanged += new System.EventHandler(this.rbAwsS3_CheckedChanged);
-
             // 
             // rbAzureBlob
             // 
             this.rbAzureBlob.AutoSize = true;
             this.rbAzureBlob.Location = new System.Drawing.Point(300, 350);
             this.rbAzureBlob.Name = "rbAzureBlob";
-            this.rbAzureBlob.Size = new System.Drawing.Size(200, 21);
+            this.rbAzureBlob.Size = new System.Drawing.Size(144, 20);
             this.rbAzureBlob.TabIndex = 1;
             this.rbAzureBlob.TabStop = true;
             this.rbAzureBlob.Text = "Azure Blob Storage";
             this.rbAzureBlob.UseVisualStyleBackColor = true;
             this.rbAzureBlob.CheckedChanged += new System.EventHandler(this.rbAzureBlob_CheckedChanged);
-
             // 
             // lblProviderSelection
             // 
@@ -483,10 +540,9 @@
             this.lblProviderSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
             this.lblProviderSelection.Location = new System.Drawing.Point(296, 200);
             this.lblProviderSelection.Name = "lblProviderSelection";
-            this.lblProviderSelection.Size = new System.Drawing.Size(250, 31);
+            this.lblProviderSelection.Size = new System.Drawing.Size(276, 31);
             this.lblProviderSelection.TabIndex = 2;
             this.lblProviderSelection.Text = "Select Cloud Provider";
-
             // 
             // btnSelectProvider
             // 
@@ -499,44 +555,7 @@
             this.btnSelectProvider.Text = "Continue";
             this.btnSelectProvider.UseVisualStyleBackColor = false;
             this.btnSelectProvider.Click += new System.EventHandler(this.btnSelectProvider_Click);
-
             // 
-            // txtAzureFolderPath
-            // 
-            this.txtAzureFolderPath.Location = new System.Drawing.Point(160, 105);
-            this.txtAzureFolderPath.Margin = new System.Windows.Forms.Padding(4);
-            this.txtAzureFolderPath.Name = "txtAzureFolderPath";
-            this.txtAzureFolderPath.Size = new System.Drawing.Size(650, 22);
-            this.txtAzureFolderPath.TabIndex = 6;
-            // 
-            // tabPageFile
-            // 
-            this.tabPageFile.Controls.Add(this.btnDownloadCsvTemplate);
-            this.tabPageFile.Controls.Add(this.btnSelectCsv);
-            this.tabPageFile.Controls.Add(this.btnViewFileData);
-            this.tabPageFile.Controls.Add(this.lblCsvPath);
-            this.tabPageFile.Controls.Add(this.txtCsvPath);
-            this.tabPageFile.Location = new System.Drawing.Point(4, 25);
-            this.tabPageFile.Name = "tabPageFile";
-            this.tabPageFile.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageFile.Size = new System.Drawing.Size(826, 828);
-            this.tabPageFile.TabIndex = 3;
-            this.tabPageFile.Text = "Dosya İşlemleri";
-            this.tabPageFile.UseVisualStyleBackColor = true;
-            // 
-            // tabPageTransfer
-            // 
-            this.tabPageTransfer.Controls.Add(this.rtbLogs);
-            this.tabPageTransfer.Controls.Add(this.btnTransfer);
-            this.tabPageTransfer.Controls.Add(this.btnTransferStop);
-            this.tabPageTransfer.Location = new System.Drawing.Point(4, 25);
-            this.tabPageTransfer.Name = "tabPageTransfer";
-            this.tabPageTransfer.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageTransfer.Size = new System.Drawing.Size(826, 828);
-            this.tabPageTransfer.TabIndex = 4;
-            this.tabPageTransfer.Text = "Transfer";
-            this.tabPageTransfer.UseVisualStyleBackColor = true;
-
             // tabPageProviderSelection
             // 
             this.tabPageProviderSelection.Controls.Add(this.btnSelectProvider);
@@ -550,13 +569,27 @@
             this.tabPageProviderSelection.TabIndex = 0;
             this.tabPageProviderSelection.Text = "Provider Selection";
             this.tabPageProviderSelection.UseVisualStyleBackColor = true;
-
+            // 
+            // btnClearLog
+            // 
+            this.btnClearLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.btnClearLog.Enabled = false;
+            this.btnClearLog.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearLog.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
+            this.btnClearLog.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnClearLog.Location = new System.Drawing.Point(10, 669);
+            this.btnClearLog.Name = "button1";
+            this.btnClearLog.Size = new System.Drawing.Size(116, 42);
+            this.btnClearLog.TabIndex = 15;
+            this.btnClearLog.Text = "CLEAR";
+            this.btnClearLog.UseVisualStyleBackColor = false;
+            this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
             // 
             // MultiCloudUploaderForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(861, 881);
+            this.ClientSize = new System.Drawing.Size(843, 773);
             this.Controls.Add(this.tabControl);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
@@ -564,8 +597,6 @@
             this.Name = "MultiCloudUploaderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Multi Cloud Media Uploader";
-            this.tabPageProviderSelection.ResumeLayout(false);
-            this.tabPageProviderSelection.PerformLayout();
             this.tabControl.ResumeLayout(false);
             this.tabPageAWS.ResumeLayout(false);
             this.tabPageAWS.PerformLayout();
@@ -574,13 +605,13 @@
             this.tabPageFile.ResumeLayout(false);
             this.tabPageFile.PerformLayout();
             this.tabPageTransfer.ResumeLayout(false);
+            this.tabPageProviderSelection.ResumeLayout(false);
+            this.tabPageProviderSelection.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
-
         #endregion
-
         private System.Windows.Forms.TextBox txtAccessKey;
         private System.Windows.Forms.Label lblAccessKey;
         private System.Windows.Forms.Label lblSecretKey;
@@ -603,9 +634,13 @@
         private System.Windows.Forms.CheckBox chkAwsOnlyLatestMedia;
         private System.Windows.Forms.CheckBox chkAzureOnlyLatestMedia;
 
-        // Azure için yeni kontroller
-        private System.Windows.Forms.TextBox txtAzureConnectionString;
-        private System.Windows.Forms.Label lblAzureConnectionString;
+
+        // Azure için yeni kontroller eklendi
+        private System.Windows.Forms.TextBox txtAzureBlobUrl;
+        private System.Windows.Forms.Label lblAzureBlobUrl;
+        private System.Windows.Forms.TextBox txtAzureSasToken;
+        private System.Windows.Forms.Label lblAzureSasToken;
+
         private System.Windows.Forms.Label lblAzureContainerName;
         private System.Windows.Forms.TextBox txtAzureContainerName;
         private System.Windows.Forms.Button btnAzureVisibleKey;
@@ -627,6 +662,7 @@
         private System.Windows.Forms.RadioButton rbAzureBlob;
         private System.Windows.Forms.Label lblProviderSelection;
         private System.Windows.Forms.Button btnSelectProvider;
+        private System.Windows.Forms.Button btnClearLog;
     }
 }
 
