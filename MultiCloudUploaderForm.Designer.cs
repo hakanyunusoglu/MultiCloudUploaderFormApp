@@ -1,4 +1,4 @@
-﻿namespace TransferMediaCsvToS3App
+﻿namespace MediaCloudUploaderFormApp
 {
     partial class MultiCloudUploaderForm
     {
@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.chkAwsOnlyLatestMedia = new System.Windows.Forms.CheckBox();
-            this.chkAzureOnlyLatestMedia = new System.Windows.Forms.CheckBox();
             this.txtAccessKey = new System.Windows.Forms.TextBox();
             this.lblAccessKey = new System.Windows.Forms.Label();
             this.lblSecretKey = new System.Windows.Forms.Label();
@@ -65,39 +63,29 @@
             this.rbAzureBlob = new System.Windows.Forms.RadioButton();
             this.rbAwsS3 = new System.Windows.Forms.RadioButton();
             this.tabPageAWS = new System.Windows.Forms.TabPage();
+            this.gbAwsMediaFilter = new System.Windows.Forms.GroupBox();
+            this.rbAwsLatestMedia = new System.Windows.Forms.RadioButton();
+            this.rbAwsHistoricalMedia = new System.Windows.Forms.RadioButton();
+            this.rbAwsAllMedia = new System.Windows.Forms.RadioButton();
             this.tabPageAzure = new System.Windows.Forms.TabPage();
             this.lblAzureFolderPath = new System.Windows.Forms.Label();
             this.txtAzureFolderPath = new System.Windows.Forms.TextBox();
+            this.gbAzureMediaFilter = new System.Windows.Forms.GroupBox();
+            this.rbAzureLatestMedia = new System.Windows.Forms.RadioButton();
+            this.rbAzureHistoricalMedia = new System.Windows.Forms.RadioButton();
+            this.rbAzureAllMedia = new System.Windows.Forms.RadioButton();
             this.tabPageFile = new System.Windows.Forms.TabPage();
             this.tabPageTransfer = new System.Windows.Forms.TabPage();
             this.btnClearLog = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPageProviderSelection.SuspendLayout();
             this.tabPageAWS.SuspendLayout();
+            this.gbAwsMediaFilter.SuspendLayout();
             this.tabPageAzure.SuspendLayout();
+            this.gbAzureMediaFilter.SuspendLayout();
             this.tabPageFile.SuspendLayout();
             this.tabPageTransfer.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // chkAwsOnlyLatestMedia
-            // 
-            this.chkAwsOnlyLatestMedia.AutoSize = true;
-            this.chkAwsOnlyLatestMedia.Location = new System.Drawing.Point(161, 169);
-            this.chkAwsOnlyLatestMedia.Name = "chkAwsOnlyLatestMedia";
-            this.chkAwsOnlyLatestMedia.Size = new System.Drawing.Size(184, 20);
-            this.chkAwsOnlyLatestMedia.TabIndex = 20;
-            this.chkAwsOnlyLatestMedia.Text = "Only Upload Latest Media";
-            this.chkAwsOnlyLatestMedia.UseVisualStyleBackColor = true;
-            // 
-            // chkAzureOnlyLatestMedia
-            // 
-            this.chkAzureOnlyLatestMedia.AutoSize = true;
-            this.chkAzureOnlyLatestMedia.Location = new System.Drawing.Point(161, 170);
-            this.chkAzureOnlyLatestMedia.Name = "chkAzureOnlyLatestMedia";
-            this.chkAzureOnlyLatestMedia.Size = new System.Drawing.Size(184, 20);
-            this.chkAzureOnlyLatestMedia.TabIndex = 20;
-            this.chkAzureOnlyLatestMedia.Text = "Only Upload Latest Media";
-            this.chkAzureOnlyLatestMedia.UseVisualStyleBackColor = true;
             // 
             // txtAccessKey
             // 
@@ -179,9 +167,9 @@
             this.btnVisibleKey.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.btnVisibleKey.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnVisibleKey.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold);
-            this.btnVisibleKey.Location = new System.Drawing.Point(760, 45);
+            this.btnVisibleKey.Location = new System.Drawing.Point(757, 45);
             this.btnVisibleKey.Name = "btnVisibleKey";
-            this.btnVisibleKey.Size = new System.Drawing.Size(50, 52);
+            this.btnVisibleKey.Size = new System.Drawing.Size(53, 52);
             this.btnVisibleKey.TabIndex = 14;
             this.btnVisibleKey.Text = "👁️";
             this.btnVisibleKey.UseVisualStyleBackColor = false;
@@ -192,7 +180,7 @@
             this.btnFillKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.btnFillKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFillKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnFillKeysFromCsv.Location = new System.Drawing.Point(20, 206);
+            this.btnFillKeysFromCsv.Location = new System.Drawing.Point(20, 244);
             this.btnFillKeysFromCsv.Name = "btnFillKeysFromCsv";
             this.btnFillKeysFromCsv.Size = new System.Drawing.Size(170, 37);
             this.btnFillKeysFromCsv.TabIndex = 17;
@@ -205,7 +193,7 @@
             this.btnKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 206);
+            this.btnKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 244);
             this.btnKeysCsvTemplateDownload.Name = "btnKeysCsvTemplateDownload";
             this.btnKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
             this.btnKeysCsvTemplateDownload.TabIndex = 18;
@@ -288,7 +276,7 @@
             this.btnFillAzureKeysFromCsv.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.btnFillAzureKeysFromCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFillAzureKeysFromCsv.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 201);
+            this.btnFillAzureKeysFromCsv.Location = new System.Drawing.Point(20, 244);
             this.btnFillAzureKeysFromCsv.Name = "btnFillAzureKeysFromCsv";
             this.btnFillAzureKeysFromCsv.Size = new System.Drawing.Size(170, 37);
             this.btnFillAzureKeysFromCsv.TabIndex = 17;
@@ -301,7 +289,7 @@
             this.btnAzureKeysCsvTemplateDownload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnAzureKeysCsvTemplateDownload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAzureKeysCsvTemplateDownload.Font = new System.Drawing.Font("Arial Rounded MT Bold", 7.8F);
-            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 201);
+            this.btnAzureKeysCsvTemplateDownload.Location = new System.Drawing.Point(210, 244);
             this.btnAzureKeysCsvTemplateDownload.Name = "btnAzureKeysCsvTemplateDownload";
             this.btnAzureKeysCsvTemplateDownload.Size = new System.Drawing.Size(250, 37);
             this.btnAzureKeysCsvTemplateDownload.TabIndex = 18;
@@ -493,7 +481,7 @@
             this.tabPageAWS.Controls.Add(this.txtRegion);
             this.tabPageAWS.Controls.Add(this.lblBucketName);
             this.tabPageAWS.Controls.Add(this.txtBucketName);
-            this.tabPageAWS.Controls.Add(this.chkAwsOnlyLatestMedia);
+            this.tabPageAWS.Controls.Add(this.gbAwsMediaFilter);
             this.tabPageAWS.Location = new System.Drawing.Point(4, 25);
             this.tabPageAWS.Name = "tabPageAWS";
             this.tabPageAWS.Padding = new System.Windows.Forms.Padding(3);
@@ -501,6 +489,50 @@
             this.tabPageAWS.TabIndex = 1;
             this.tabPageAWS.Text = "AWS S3";
             this.tabPageAWS.UseVisualStyleBackColor = true;
+            // 
+            // gbAwsMediaFilter
+            // 
+            this.gbAwsMediaFilter.Controls.Add(this.rbAwsLatestMedia);
+            this.gbAwsMediaFilter.Controls.Add(this.rbAwsHistoricalMedia);
+            this.gbAwsMediaFilter.Controls.Add(this.rbAwsAllMedia);
+            this.gbAwsMediaFilter.Location = new System.Drawing.Point(161, 169);
+            this.gbAwsMediaFilter.Name = "gbAwsMediaFilter";
+            this.gbAwsMediaFilter.Size = new System.Drawing.Size(649, 60);
+            this.gbAwsMediaFilter.TabIndex = 21;
+            this.gbAwsMediaFilter.TabStop = false;
+            this.gbAwsMediaFilter.Text = "Media Filter";
+            // 
+            // rbAwsLatestMedia
+            // 
+            this.rbAwsLatestMedia.AutoSize = true;
+            this.rbAwsLatestMedia.Location = new System.Drawing.Point(147, 25);
+            this.rbAwsLatestMedia.Name = "rbAwsLatestMedia";
+            this.rbAwsLatestMedia.Size = new System.Drawing.Size(183, 20);
+            this.rbAwsLatestMedia.TabIndex = 1;
+            this.rbAwsLatestMedia.Text = "Only Upload Latest Media";
+            this.rbAwsLatestMedia.UseVisualStyleBackColor = true;
+            // 
+            // rbAwsHistoricalMedia
+            // 
+            this.rbAwsHistoricalMedia.AutoSize = true;
+            this.rbAwsHistoricalMedia.Location = new System.Drawing.Point(377, 25);
+            this.rbAwsHistoricalMedia.Name = "rbAwsHistoricalMedia";
+            this.rbAwsHistoricalMedia.Size = new System.Drawing.Size(203, 20);
+            this.rbAwsHistoricalMedia.TabIndex = 2;
+            this.rbAwsHistoricalMedia.Text = "Only Upload Historical Media";
+            this.rbAwsHistoricalMedia.UseVisualStyleBackColor = true;
+            // 
+            // rbAwsAllMedia
+            // 
+            this.rbAwsAllMedia.AutoSize = true;
+            this.rbAwsAllMedia.Checked = true;
+            this.rbAwsAllMedia.Location = new System.Drawing.Point(15, 25);
+            this.rbAwsAllMedia.Name = "rbAwsAllMedia";
+            this.rbAwsAllMedia.Size = new System.Drawing.Size(84, 20);
+            this.rbAwsAllMedia.TabIndex = 0;
+            this.rbAwsAllMedia.TabStop = true;
+            this.rbAwsAllMedia.Text = "All Media";
+            this.rbAwsAllMedia.UseVisualStyleBackColor = true;
             // 
             // tabPageAzure
             // 
@@ -513,9 +545,9 @@
             this.tabPageAzure.Controls.Add(this.txtAzureSasToken);
             this.tabPageAzure.Controls.Add(this.lblAzureContainerName);
             this.tabPageAzure.Controls.Add(this.txtAzureContainerName);
-            this.tabPageAzure.Controls.Add(this.chkAzureOnlyLatestMedia);
             this.tabPageAzure.Controls.Add(this.lblAzureFolderPath);
             this.tabPageAzure.Controls.Add(this.txtAzureFolderPath);
+            this.tabPageAzure.Controls.Add(this.gbAzureMediaFilter);
             this.tabPageAzure.Location = new System.Drawing.Point(4, 25);
             this.tabPageAzure.Name = "tabPageAzure";
             this.tabPageAzure.Padding = new System.Windows.Forms.Padding(3);
@@ -541,6 +573,50 @@
             this.txtAzureFolderPath.Name = "txtAzureFolderPath";
             this.txtAzureFolderPath.Size = new System.Drawing.Size(650, 22);
             this.txtAzureFolderPath.TabIndex = 8;
+            // 
+            // gbAzureMediaFilter
+            // 
+            this.gbAzureMediaFilter.Controls.Add(this.rbAzureLatestMedia);
+            this.gbAzureMediaFilter.Controls.Add(this.rbAzureHistoricalMedia);
+            this.gbAzureMediaFilter.Controls.Add(this.rbAzureAllMedia);
+            this.gbAzureMediaFilter.Location = new System.Drawing.Point(161, 169);
+            this.gbAzureMediaFilter.Name = "gbAzureMediaFilter";
+            this.gbAzureMediaFilter.Size = new System.Drawing.Size(649, 60);
+            this.gbAzureMediaFilter.TabIndex = 21;
+            this.gbAzureMediaFilter.TabStop = false;
+            this.gbAzureMediaFilter.Text = "Media Filter";
+            // 
+            // rbAzureLatestMedia
+            // 
+            this.rbAzureLatestMedia.AutoSize = true;
+            this.rbAzureLatestMedia.Location = new System.Drawing.Point(147, 25);
+            this.rbAzureLatestMedia.Name = "rbAzureLatestMedia";
+            this.rbAzureLatestMedia.Size = new System.Drawing.Size(183, 20);
+            this.rbAzureLatestMedia.TabIndex = 1;
+            this.rbAzureLatestMedia.Text = "Only Upload Latest Media";
+            this.rbAzureLatestMedia.UseVisualStyleBackColor = true;
+            // 
+            // rbAzureHistoricalMedia
+            // 
+            this.rbAzureHistoricalMedia.AutoSize = true;
+            this.rbAzureHistoricalMedia.Location = new System.Drawing.Point(377, 25);
+            this.rbAzureHistoricalMedia.Name = "rbAzureHistoricalMedia";
+            this.rbAzureHistoricalMedia.Size = new System.Drawing.Size(203, 20);
+            this.rbAzureHistoricalMedia.TabIndex = 2;
+            this.rbAzureHistoricalMedia.Text = "Only Upload Historical Media";
+            this.rbAzureHistoricalMedia.UseVisualStyleBackColor = true;
+            // 
+            // rbAzureAllMedia
+            // 
+            this.rbAzureAllMedia.AutoSize = true;
+            this.rbAzureAllMedia.Checked = true;
+            this.rbAzureAllMedia.Location = new System.Drawing.Point(15, 25);
+            this.rbAzureAllMedia.Name = "rbAzureAllMedia";
+            this.rbAzureAllMedia.Size = new System.Drawing.Size(84, 20);
+            this.rbAzureAllMedia.TabIndex = 0;
+            this.rbAzureAllMedia.TabStop = true;
+            this.rbAzureAllMedia.Text = "All Media";
+            this.rbAzureAllMedia.UseVisualStyleBackColor = true;
             // 
             // tabPageFile
             // 
@@ -603,8 +679,12 @@
             this.tabPageProviderSelection.PerformLayout();
             this.tabPageAWS.ResumeLayout(false);
             this.tabPageAWS.PerformLayout();
+            this.gbAwsMediaFilter.ResumeLayout(false);
+            this.gbAwsMediaFilter.PerformLayout();
             this.tabPageAzure.ResumeLayout(false);
             this.tabPageAzure.PerformLayout();
+            this.gbAzureMediaFilter.ResumeLayout(false);
+            this.gbAzureMediaFilter.PerformLayout();
             this.tabPageFile.ResumeLayout(false);
             this.tabPageFile.PerformLayout();
             this.tabPageTransfer.ResumeLayout(false);
@@ -632,8 +712,10 @@
         private System.Windows.Forms.Button btnDownloadCsvTemplate;
         private System.Windows.Forms.Button btnFillKeysFromCsv;
         private System.Windows.Forms.Button btnKeysCsvTemplateDownload;
-        private System.Windows.Forms.CheckBox chkAwsOnlyLatestMedia;
-        private System.Windows.Forms.CheckBox chkAzureOnlyLatestMedia;
+        private System.Windows.Forms.GroupBox gbAwsMediaFilter;
+        private System.Windows.Forms.RadioButton rbAwsLatestMedia;
+        private System.Windows.Forms.RadioButton rbAwsHistoricalMedia;
+        private System.Windows.Forms.RadioButton rbAwsAllMedia;
 
 
         // Azure için yeni kontroller eklendi
@@ -649,6 +731,11 @@
         private System.Windows.Forms.Button btnAzureKeysCsvTemplateDownload;
         private System.Windows.Forms.Label lblAzureFolderPath;
         private System.Windows.Forms.TextBox txtAzureFolderPath;
+        private System.Windows.Forms.GroupBox gbAzureMediaFilter;
+        private System.Windows.Forms.RadioButton rbAzureLatestMedia;
+        private System.Windows.Forms.RadioButton rbAzureHistoricalMedia;
+        private System.Windows.Forms.RadioButton rbAzureAllMedia;
+
 
         // Tab kontrolü
         private System.Windows.Forms.TabControl tabControl;

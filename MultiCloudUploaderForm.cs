@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TransferMediaCsvToS3App
+namespace MediaCloudUploaderFormApp
 {
     public partial class MultiCloudUploaderForm : Form
     {
@@ -38,6 +38,9 @@ namespace TransferMediaCsvToS3App
                 tabControl.TabPages.Clear();
                 tabControl.TabPages.Add(tabPageProviderSelection);
                 tabControl.SelectedTab = tabPageProviderSelection;
+
+                rbAwsAllMedia.Checked = true;
+                rbAzureAllMedia.Checked = true;
             }
             catch (Exception ex)
             {
@@ -178,6 +181,12 @@ namespace TransferMediaCsvToS3App
                 return;
             }
 
+            MediaFilterMode filterMode = MediaFilterMode.All;
+            if (rbAwsLatestMedia.Checked)
+                filterMode = MediaFilterMode.LatestOnly;
+            else if (rbAwsHistoricalMedia.Checked)
+                filterMode = MediaFilterMode.HistoricalOnly;
+
             await ProcessCsvAndUpload(csvPath, async (record, fileStream, fileName) =>
             {
                 bool exists = await awsService.CheckIfFileExistsAsync(fileName);
@@ -188,12 +197,14 @@ namespace TransferMediaCsvToS3App
 
                     await awsService.UploadFileAsync(fileName, fileStream, _cancellationTokenSource.Token);
                     Log(record.RowNumber, $"Uploaded: {fileName}");
+                    return true;
                 }
                 else
                 {
                     Log(record.RowNumber, $"Skipped (Exists): {fileName}");
+                    return false;
                 }
-            }, chkAwsOnlyLatestMedia.Checked);
+            }, filterMode);
         }
 
         private async Task TransferToAzureBlob()
@@ -224,6 +235,12 @@ namespace TransferMediaCsvToS3App
             //    return;
             //}
 
+            MediaFilterMode filterMode = MediaFilterMode.All;
+            if (rbAzureLatestMedia.Checked)
+                filterMode = MediaFilterMode.LatestOnly;
+            else if (rbAzureHistoricalMedia.Checked)
+                filterMode = MediaFilterMode.HistoricalOnly;
+
             await ProcessCsvAndUpload(csvPath, async (record, fileStream, fileName) =>
             {
                 bool exists = await azureService.CheckIfBlobExistsAsync(fileName);
@@ -242,16 +259,23 @@ namespace TransferMediaCsvToS3App
                     }
 
                     Log(record.RowNumber, $"Uploaded: {fileName}");
+                    return true;
                 }
                 else
                 {
                     Log(record.RowNumber, $"Skipped (Exists): {fileName}");
+                    return false;
                 }
-            }, chkAzureOnlyLatestMedia.Checked);
+            }, filterMode);
         }
 
-        private async Task ProcessCsvAndUpload(string csvPath, Func<CsvRecordModel, Stream, string, Task> uploadAction, bool onlyLatestRecords = false)
+        private async Task ProcessCsvAndUpload(string csvPath, Func<CsvRecordModel, Stream, string, Task<bool>> uploadAction, MediaFilterMode filterMode)
         {
+            int uploadedCount = 0;
+            int skippedCount = 0;
+            int failedCount = 0;
+            DateTime startTime = DateTime.Now;
+
             using (var stream = new FileStream(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = new StreamReader(stream))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
@@ -262,7 +286,8 @@ namespace TransferMediaCsvToS3App
                 var headers = csv.Context.Reader.HeaderRecord;
 
                 if (!headers.Contains("media_url") || !headers.Contains("product_stock_code") ||
-                    !headers.Contains("media_direction") || !headers.Contains("created_date"))
+                    !headers.Contains("media_direction") || !headers.Contains("created_date") ||
+                    !headers.Contains("erp_colorCode"))
                 {
                     MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -270,15 +295,26 @@ namespace TransferMediaCsvToS3App
 
                 var records = csv.GetRecords<dynamic>();
                 var processedRecords = CsvProcessor.ProcessCsvRecords(records);
+                int totalRecordsCount = processedRecords.Count;
 
-                if (onlyLatestRecords)
+                switch (filterMode)
                 {
-                    processedRecords = processedRecords.GetLatestRecords();
+                    case MediaFilterMode.LatestOnly:
+                        processedRecords = processedRecords.GetLatestRecords();
+                        Log(0, "Processing mode: Only uploading latest media files for each product and direction.");
+                        break;
+                    case MediaFilterMode.HistoricalOnly:
+                        processedRecords = processedRecords.GetArchiveRecords();
+                        Log(0, "Processing mode: Only uploading historical (non-latest) media files.");
+                        break;
+                    case MediaFilterMode.All:
+                    default:
+                        Log(0, "Processing mode: Uploading all media files (latest and historical).");
+                        break;
                 }
 
-                Log(0, onlyLatestRecords ?
-        "Processing mode: Only uploading latest media files for each product and direction." :
-        "Processing mode: Uploading all media files.");
+                int filteredRecordsCount = processedRecords.Count;
+                Log(0, $"Found {totalRecordsCount} total records, {filteredRecordsCount} records after applying filter.");
 
                 foreach (var record in processedRecords)
                 {
@@ -291,6 +327,7 @@ namespace TransferMediaCsvToS3App
                     string mediaUrl = record.media_url;
                     string stockCode = CleanString(record.product_stock_code);
                     string mediaDirection = CleanString(record.media_direction);
+                    string colorCode = CleanString(record.color_code);
 
                     if (!string.IsNullOrEmpty(mediaUrl))
                     {
@@ -303,18 +340,54 @@ namespace TransferMediaCsvToS3App
 
                             if (record.IsLatestRecord)
                             {
-                                fileName = $"{stockCode}_{mediaDirection}{fileExtension}";
+                                fileName = $"{stockCode}_{colorCode}_{mediaDirection}{fileExtension}";
                             }
                             else
                             {
-                                fileName = $"_{stockCode}_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
+                                fileName = $"_{stockCode}_{colorCode}_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
                             }
 
-                            await uploadAction(record, fileStream, fileName);
+                            try
+                            {
+                                bool wasUploaded = await uploadAction(record, fileStream, fileName);
+
+                                if (wasUploaded)
+                                    uploadedCount++;
+                                else
+                                    skippedCount++;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log(record.RowNumber, $"Failed to upload: {fileName} - Error: {ex.Message}");
+                                failedCount++;
+                            }
+                        }
+                        else
+                        {
+                            failedCount++;
                         }
                     }
                 }
             }
+
+            TimeSpan duration = DateTime.Now - startTime;
+            string formattedDuration = duration.ToString(@"hh\:mm\:ss");
+
+            Log(0, $"--------------------------------------------------");
+            Log(0, $"TRANSFER COMPLETED");
+            Log(0, $"Duration: {formattedDuration}");
+            Log(0, $"Total Files Processed: {uploadedCount + skippedCount + failedCount}");
+            Log(0, $"Successfully Uploaded: {uploadedCount}");
+            Log(0, $"Skipped (Already Exists): {skippedCount}");
+            if (failedCount > 0)
+                Log(0, $"Failed: {failedCount}");
+            Log(0, $"--------------------------------------------------");
+
+            MessageBox.Show(
+                $"Transfer completed!\n\nUploaded: {uploadedCount}\nSkipped: {skippedCount}\nFailed: {failedCount}",
+                "Transfer Results",
+                MessageBoxButtons.OK,
+                failedCount > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
         }
 
         private string CleanString(string input)

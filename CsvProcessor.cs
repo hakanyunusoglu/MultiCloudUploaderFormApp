@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TransferMediaCsvToS3App
+namespace MediaCloudUploaderFormApp
 {
     public static class CsvProcessor
     {
@@ -15,6 +15,7 @@ namespace TransferMediaCsvToS3App
                 media_direction = r.media_direction,
                 created_date = DateTime.Parse(r.created_date.ToString()),
                 media_url = r.media_url,
+                color_code = r.color_code,
                 IsLatestRecord = false
             }).ToList();
 
@@ -37,6 +38,11 @@ namespace TransferMediaCsvToS3App
         public static List<CsvRecordModel> GetLatestRecords(this IEnumerable<CsvRecordModel> records)
         {
             return records.Where(r => r.IsLatestRecord).ToList();
+        }
+
+        public static List<CsvRecordModel> GetArchiveRecords(this IEnumerable<CsvRecordModel> records)
+        {
+            return records.Where(r => !r.IsLatestRecord).ToList();
         }
     }
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TransferMediaCsvToS3App.Properties {
+namespace MediaCloudUploaderFormApp.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TransferMediaCsvToS3App.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TransferMediaCsvToS3App.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MediaCloudUploaderFormApp.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -71,8 +71,8 @@ namespace TransferMediaCsvToS3App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to product_stock_code,media_direction,media_url
-        ///N19L0549000 (Example),1-20 (only numeric),https://www.google.com/a2771d0e-4f9e-4e13-9cff-2e9648eadd16.jpg (Example)
+        ///   Looks up a localized string similar to product_stock_code,media_direction,media_url,created_date,color_code
+        ///4190538752 (Example),1-20 (only numeric),https://www.google.com/a2771d0e-4f9e-4e13-9cff-2e9648eadd16.jpg (Example),2025-01-18T10:06:20.461617Z,206
         ///.
         /// </summary>
         internal static string template {

@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
-namespace TransferMediaCsvToS3App
+namespace MediaCloudUploaderFormApp
 {
     public partial class ViewFileModalForm : Form
     {

@@ -1,4 +1,4 @@
-﻿namespace TransferMediaCsvToS3App
+﻿namespace MediaCloudUploaderFormApp
 {
     partial class ViewFileModalForm
     {

@@ -8,8 +8,8 @@
     <ProjectGuid>{AF8E2A6F-071B-4F0D-8BA8-4FA41E02255F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <EnableClickOnceDeployment>false</EnableClickOnceDeployment>
-    <RootNamespace>TransferMediaCsvToS3App</RootNamespace>
-    <AssemblyName>TransferMediaCsvToS3App</AssemblyName>
+    <RootNamespace>MediaCloudUploaderFormApp</RootNamespace>
+    <AssemblyName>MediaCloudUploaderFormApp</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -27,7 +27,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>false</MapFileExtensions>
-    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -66,7 +66,7 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
-    <StartupObject>TransferMediaCsvToS3App.Program</StartupObject>
+    <StartupObject>MediaCloudUploaderFormApp.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
@@ -191,6 +191,7 @@
     <Compile Include="AzureBlobStorageService.cs" />
     <Compile Include="CsvProcessor.cs" />
     <Compile Include="CsvRecordModel.cs" />
+    <Compile Include="MediaFilterMode.cs" />
     <Compile Include="MultiCloudUploaderForm.cs">
       <SubType>Form</SubType>
     </Compile>

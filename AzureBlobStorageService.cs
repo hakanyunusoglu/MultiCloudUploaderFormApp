@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TransferMediaCsvToS3App
+namespace MediaCloudUploaderFormApp
 {
     public class AzureBlobStorageService
     {
