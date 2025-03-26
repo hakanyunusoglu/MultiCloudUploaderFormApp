@@ -287,7 +287,7 @@ namespace MediaCloudUploaderFormApp
 
                 if (!headers.Contains("media_url") || !headers.Contains("product_stock_code") ||
                     !headers.Contains("media_direction") || !headers.Contains("created_date") ||
-                    !headers.Contains("erp_colorCode"))
+                    !headers.Contains("color_code"))
                 {
                     MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -340,11 +340,25 @@ namespace MediaCloudUploaderFormApp
 
                             if (record.IsLatestRecord)
                             {
-                                fileName = $"{stockCode}_{colorCode}_{mediaDirection}{fileExtension}";
+                                if (!string.IsNullOrEmpty(colorCode))
+                                {
+                                    fileName = $"{stockCode}_{colorCode}_{mediaDirection}{fileExtension}";                                
+                                }
+                                else
+                                {
+                                    fileName = $"{stockCode}_0_{mediaDirection}{fileExtension}";
+                                }
                             }
                             else
                             {
-                                fileName = $"_{stockCode}_{colorCode}_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
+                                if (!string.IsNullOrEmpty(colorCode))
+                                {
+                                    fileName = $"_{stockCode}_{colorCode}_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
+                                }
+                                else
+                                {
+                                    fileName = $"_{stockCode}_0_{mediaDirection}_{Guid.NewGuid()}{fileExtension}";
+                                }
                             }
 
                             try
