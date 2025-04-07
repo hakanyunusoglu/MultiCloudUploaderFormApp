@@ -287,7 +287,7 @@ namespace MediaCloudUploaderFormApp
 
                 if (!headers.Contains("media_url") || !headers.Contains("product_stock_code") ||
                     !headers.Contains("media_direction") || !headers.Contains("created_date") ||
-                    !headers.Contains("color_code"))
+                    !headers.Contains("erp_colorCode") || !headers.Contains("integration_colorCode"))
                 {
                     MessageBox.Show("The CSV format is wrong. Use the headings in the template in the same way!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;

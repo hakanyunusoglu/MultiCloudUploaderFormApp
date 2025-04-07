@@ -8,27 +8,41 @@ namespace MediaCloudUploaderFormApp
     {
         public static List<CsvRecordModel> ProcessCsvRecords(IEnumerable<dynamic> records)
         {
-            var processedRecords = records.Select((r, index) => new CsvRecordModel
+            var processedRecords = records.Select((r, index) =>
             {
-                RowNumber = index + 1,
-                product_stock_code = r.product_stock_code,
-                media_direction = r.media_direction,
-                created_date = DateTime.Parse(r.created_date.ToString()),
-                media_url = r.media_url,
-                color_code = r.color_code,
-                IsLatestRecord = false
+                string erpColorCode = !string.IsNullOrEmpty(r.erp_colorCode?.ToString()) ? FormatColorCode(r.erp_colorCode.ToString()) : null;
+
+                string integrationColorCode = !string.IsNullOrEmpty(r.integration_colorCode?.ToString()) ? FormatColorCode(r.integration_colorCode.ToString()) : null;
+
+                return new CsvRecordModel
+                {
+                    RowNumber = index + 1,
+                    product_stock_code = r.product_stock_code,
+                    media_direction = r.media_direction,
+                    created_date = DateTime.Parse(r.created_date.ToString()),
+                    media_url = r.media_url,
+                    erp_colorCode = erpColorCode,
+                    integration_colorCode = integrationColorCode,
+                    color_code = !string.IsNullOrEmpty(erpColorCode) ? erpColorCode : !string.IsNullOrEmpty(integrationColorCode) ? integrationColorCode : null,
+                    IsLatestRecord = false
+                };
             }).ToList();
 
             var groupedByStockCode = processedRecords.GroupBy(r => r.product_stock_code);
 
             foreach (var stockCodeGroup in groupedByStockCode)
             {
-                var groupedByDirection = stockCodeGroup.GroupBy(r => r.media_direction);
+                var groupedByColorCode = stockCodeGroup.Where(x => !string.IsNullOrEmpty(x.color_code)).GroupBy(r => r.color_code);
 
-                foreach (var directionGroup in groupedByDirection)
+                foreach (var colorCodeGroup in groupedByColorCode)
                 {
-                    var latestRecord = directionGroup.OrderByDescending(r => r.created_date).First();
-                    latestRecord.IsLatestRecord = true;
+                    var groupedByDirection = colorCodeGroup.GroupBy(r => r.media_direction);
+
+                    foreach (var directionGroup in groupedByDirection)
+                    {
+                        var latestRecord = directionGroup.OrderByDescending(r => r.created_date).First();
+                        latestRecord.IsLatestRecord = true;
+                    }
                 }
             }
 
@@ -43,6 +57,15 @@ namespace MediaCloudUploaderFormApp
         public static List<CsvRecordModel> GetArchiveRecords(this IEnumerable<CsvRecordModel> records)
         {
             return records.Where(r => !r.IsLatestRecord).ToList();
+        }
+
+        private static string FormatColorCode(string colorCode)
+        {
+            if (!string.IsNullOrEmpty(colorCode) && colorCode.Length < 3)
+            {
+                return colorCode.PadLeft(3, '0');
+            }
+            return colorCode;
         }
     }
 }
