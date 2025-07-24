@@ -77,6 +77,13 @@
             this.tabPageFile = new System.Windows.Forms.TabPage();
             this.tabPageTransfer = new System.Windows.Forms.TabPage();
             this.btnClearLog = new System.Windows.Forms.Button();
+
+            this.gbDataTransferMode = new System.Windows.Forms.GroupBox();
+            this.rbCreateWithNewList = new System.Windows.Forms.RadioButton();
+            this.rbCopyFromExisting = new System.Windows.Forms.RadioButton();
+            this.gbProviderSelection = new System.Windows.Forms.GroupBox();
+
+
             this.tabControl.SuspendLayout();
             this.tabPageProviderSelection.SuspendLayout();
             this.tabPageAWS.SuspendLayout();
@@ -414,6 +421,8 @@
             this.tabPageProviderSelection.Controls.Add(this.lblProviderSelection);
             this.tabPageProviderSelection.Controls.Add(this.rbAzureBlob);
             this.tabPageProviderSelection.Controls.Add(this.rbAwsS3);
+            this.tabPageProviderSelection.Controls.Add(this.gbDataTransferMode);
+            this.tabPageProviderSelection.Controls.Add(this.gbProviderSelection);
             this.tabPageProviderSelection.Location = new System.Drawing.Point(4, 25);
             this.tabPageProviderSelection.Name = "tabPageProviderSelection";
             this.tabPageProviderSelection.Padding = new System.Windows.Forms.Padding(3);
@@ -426,7 +435,7 @@
             // 
             this.btnSelectProvider.BackColor = System.Drawing.Color.LightBlue;
             this.btnSelectProvider.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10F);
-            this.btnSelectProvider.Location = new System.Drawing.Point(300, 400);
+            this.btnSelectProvider.Location = new System.Drawing.Point(300, 490);
             this.btnSelectProvider.Name = "btnSelectProvider";
             this.btnSelectProvider.Size = new System.Drawing.Size(200, 50);
             this.btnSelectProvider.TabIndex = 3;
@@ -447,7 +456,7 @@
             // rbAzureBlob
             // 
             this.rbAzureBlob.AutoSize = true;
-            this.rbAzureBlob.Location = new System.Drawing.Point(300, 350);
+            this.rbAzureBlob.Location = new System.Drawing.Point(20, 60);
             this.rbAzureBlob.Name = "rbAzureBlob";
             this.rbAzureBlob.Size = new System.Drawing.Size(144, 20);
             this.rbAzureBlob.TabIndex = 1;
@@ -459,7 +468,7 @@
             // rbAwsS3
             // 
             this.rbAwsS3.AutoSize = true;
-            this.rbAwsS3.Location = new System.Drawing.Point(300, 300);
+            this.rbAwsS3.Location = new System.Drawing.Point(20, 30);
             this.rbAwsS3.Name = "rbAwsS3";
             this.rbAwsS3.Size = new System.Drawing.Size(78, 20);
             this.rbAwsS3.TabIndex = 0;
@@ -501,6 +510,48 @@
             this.gbAwsMediaFilter.TabIndex = 21;
             this.gbAwsMediaFilter.TabStop = false;
             this.gbAwsMediaFilter.Text = "Media Filter";
+
+            // gbDataTransferMode
+            this.gbDataTransferMode.Controls.Add(this.rbCopyFromExisting);
+            this.gbDataTransferMode.Controls.Add(this.rbCreateWithNewList);
+            this.gbDataTransferMode.Location = new System.Drawing.Point(225, 370);
+            this.gbDataTransferMode.Name = "gbDataTransferMode";
+            this.gbDataTransferMode.Size = new System.Drawing.Size(350, 100);
+            this.gbDataTransferMode.TabIndex = 6;
+            this.gbDataTransferMode.TabStop = false;
+            this.gbDataTransferMode.Text = "Data Transfer Mode";
+
+            // gbProviderSelection
+            this.gbProviderSelection.Controls.Add(this.rbAzureBlob);
+            this.gbProviderSelection.Controls.Add(this.rbAwsS3);
+            this.gbProviderSelection.Location = new System.Drawing.Point(225, 250);
+            this.gbProviderSelection.Name = "gbProviderSelection";
+            this.gbProviderSelection.Size = new System.Drawing.Size(350, 100);
+            this.gbProviderSelection.TabIndex = 5;
+            this.gbProviderSelection.TabStop = false;
+            this.gbProviderSelection.Text = "Cloud Provider Selection";
+
+            // rbCreateWithNewList
+            this.rbCreateWithNewList.AutoSize = true;
+            this.rbCreateWithNewList.Checked = true;
+            this.rbCreateWithNewList.Location = new System.Drawing.Point(20, 30);
+            this.rbCreateWithNewList.Name = "rbCreateWithNewList";
+            this.rbCreateWithNewList.Size = new System.Drawing.Size(153, 20);
+            this.rbCreateWithNewList.TabIndex = 0;
+            this.rbCreateWithNewList.TabStop = true;
+            this.rbCreateWithNewList.Text = "Create With New List";
+            this.rbCreateWithNewList.UseVisualStyleBackColor = true;
+
+            // rbCopyFromExisting
+            this.rbCopyFromExisting.AutoSize = true;
+            this.rbCopyFromExisting.Location = new System.Drawing.Point(20, 60);
+            this.rbCopyFromExisting.Name = "rbCopyFromExisting";
+            this.rbCopyFromExisting.Size = new System.Drawing.Size(147, 20);
+            this.rbCopyFromExisting.TabIndex = 1;
+            this.rbCopyFromExisting.Text = "Copy From Existing";
+            this.rbCopyFromExisting.UseVisualStyleBackColor = true;
+
+
             // 
             // rbAwsLatestMedia
             // 
@@ -751,6 +802,11 @@
         private System.Windows.Forms.Label lblProviderSelection;
         private System.Windows.Forms.Button btnSelectProvider;
         private System.Windows.Forms.Button btnClearLog;
+
+        private System.Windows.Forms.GroupBox gbDataTransferMode;
+        private System.Windows.Forms.RadioButton rbCreateWithNewList;
+        private System.Windows.Forms.RadioButton rbCopyFromExisting;
+        private System.Windows.Forms.GroupBox gbProviderSelection;
     }
 }
 

@@ -27,7 +27,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>false</MapFileExtensions>
-    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationRevision>11</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -191,6 +191,10 @@
     <Compile Include="AzureBlobStorageService.cs" />
     <Compile Include="CsvProcessor.cs" />
     <Compile Include="CsvRecordModel.cs" />
+    <Compile Include="DataTransferMode.cs" />
+    <Compile Include="ExistingMediaModel.cs" />
+    <Compile Include="M3u8DownloadService.cs" />
+    <Compile Include="M3u8FileInfo.cs" />
     <Compile Include="MediaFilterMode.cs" />
     <Compile Include="MultiCloudUploaderForm.cs">
       <SubType>Form</SubType>

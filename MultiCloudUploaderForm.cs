@@ -20,6 +20,7 @@ namespace MediaCloudUploaderFormApp
         private bool isAwsKeysVisible = false;
         private bool isAzureKeysVisible = false;
         private HttpClient _httpClient = new HttpClient();
+        private M3u8DownloadService _m3u8Service;
 
         public enum StorageProvider
         {
@@ -29,6 +30,7 @@ namespace MediaCloudUploaderFormApp
         }
 
         private StorageProvider currentProvider = StorageProvider.None;
+        private DataTransferMode currentTransferMode = DataTransferMode.CreateWithNewList;
         public MultiCloudUploaderForm()
         {
             try
@@ -41,6 +43,20 @@ namespace MediaCloudUploaderFormApp
 
                 rbAwsAllMedia.Checked = true;
                 rbAzureAllMedia.Checked = true;
+                rbCreateWithNewList.Checked = true;
+
+                rbCreateWithNewList.CheckedChanged += (s, e) =>
+                {
+                    if (rbCreateWithNewList.Checked)
+                        currentTransferMode = DataTransferMode.CreateWithNewList;
+                };
+                rbCopyFromExisting.CheckedChanged += (s, e) =>
+                {
+                    if (rbCopyFromExisting.Checked)
+                        currentTransferMode = DataTransferMode.CopyFromExisting;
+                };
+
+                _m3u8Service = new M3u8DownloadService(_httpClient);
             }
             catch (Exception ex)
             {
@@ -48,6 +64,7 @@ namespace MediaCloudUploaderFormApp
                 Environment.Exit(1);
             }
         }
+
         private void btnSelectCsv_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -111,7 +128,7 @@ namespace MediaCloudUploaderFormApp
         {
             try
             {
-                Log(0, $"Transfer initiated. Current Provider: {currentProvider}");
+                Log(0, $"Transfer initiated. Current Provider: {currentProvider}, Mode: {currentTransferMode}");
 
                 if (currentProvider == StorageProvider.None)
                 {
@@ -125,13 +142,20 @@ namespace MediaCloudUploaderFormApp
                 btnClearLog.Enabled = false;
                 tabControl.TabPages.Remove(tabPageProviderSelection);
 
-                if (currentProvider == StorageProvider.AwsS3)
+                if (currentTransferMode == DataTransferMode.CreateWithNewList)
                 {
-                    await TransferToAwsS3();
+                    if (currentProvider == StorageProvider.AwsS3)
+                    {
+                        await TransferToAwsS3();
+                    }
+                    else
+                    {
+                        await TransferToAzureBlob();
+                    }
                 }
                 else
                 {
-                    await TransferToAzureBlob();
+                    await TransferExistingMedia();
                 }
             }
             catch (OperationCanceledException)
@@ -150,6 +174,345 @@ namespace MediaCloudUploaderFormApp
                 btnClearLog.Enabled = true;
                 tabControl.TabPages.Insert(0, tabPageProviderSelection);
             }
+        }
+
+        private async Task TransferExistingMedia()
+        {
+            string csvPath = txtCsvPath.Text;
+
+            if (string.IsNullOrEmpty(csvPath))
+            {
+                MessageBox.Show("Please select a CSV file!", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int uploadedCount = 0;
+            int skippedCount = 0;
+            int failedCount = 0;
+            DateTime startTime = DateTime.Now;
+
+            using (var stream = new FileStream(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                csv.Read();
+                csv.ReadHeader();
+
+                var headers = csv.Context.Reader.HeaderRecord;
+
+                if (!headers.Contains("media_name") || !headers.Contains("media_extension") ||
+                    !headers.Contains("media_url") || !headers.Contains("is_converted_m3u8") ||
+                    !headers.Contains("m3u8_media_url"))
+                {
+                    MessageBox.Show("The CSV format is wrong for existing media transfer!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var records = csv.GetRecords<dynamic>();
+                var processedRecords = CsvProcessor.ProcessCsvRecordsToExistingMedias(records);
+
+                Log(0, $"Found {processedRecords.Count} existing media records to process.");
+
+                foreach (var record in processedRecords)
+                {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        Log(record.RowNumber, "The transfer has been canceled!");
+                        break;
+                    }
+
+                    try
+                    {
+                        if (record.is_converted_m3u8 && !string.IsNullOrEmpty(record.m3u8_media_url))
+                        {
+                            // M3U8 transfer işlemi
+                            await TransferM3u8Media(record);
+                            bool success = await TransferSingleMedia(record);
+                            if (success)
+                                uploadedCount++;
+                            else
+                                skippedCount++;
+                        }
+                        else
+                        {
+                            // Normal media transfer işlemi
+                            bool success = await TransferSingleMedia(record);
+                            if (success)
+                                uploadedCount++;
+                            else
+                                skippedCount++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(record.RowNumber, $"Failed to transfer: {record.media_name} - Error: {ex.Message}");
+                        failedCount++;
+                    }
+                }
+            }
+
+            TimeSpan duration = DateTime.Now - startTime;
+            string formattedDuration = duration.ToString(@"hh\:mm\:ss");
+
+            Log(0, $"--------------------------------------------------");
+            Log(0, $"EXISTING MEDIA TRANSFER COMPLETED");
+            Log(0, $"Duration: {formattedDuration}");
+            Log(0, $"Total Files Processed: {uploadedCount + skippedCount + failedCount}");
+            Log(0, $"Successfully Uploaded: {uploadedCount}");
+            Log(0, $"Skipped (Already Exists): {skippedCount}");
+            if (failedCount > 0)
+                Log(0, $"Failed: {failedCount}");
+            Log(0, $"--------------------------------------------------");
+
+            MessageBox.Show(
+                $"Transfer completed!\n\nUploaded: {uploadedCount}\nSkipped: {skippedCount}\nFailed: {failedCount}",
+                "Transfer Results",
+                MessageBoxButtons.OK,
+                failedCount > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+        }
+
+        private string BuildFileName(ExistingMediaModel record)
+        {
+            string mediaName = record.media_name?.Trim();
+            string extension = record.media_extension?.Trim();
+
+            if (string.IsNullOrEmpty(mediaName))
+            {
+                throw new ArgumentException("Media name cannot be empty");
+            }
+
+            // media_name'de zaten extension var mı kontrol et
+            if (Path.HasExtension(mediaName))
+            {
+                // media_name'de extension var, bunu kullan
+                return mediaName;
+            }
+            else
+            {
+                // media_name'de extension yok, media_extension'dan ekle
+                if (string.IsNullOrEmpty(extension))
+                {
+                    throw new ArgumentException($"Extension is required for media: {mediaName}");
+                }
+
+                // Extension'da nokta var mı kontrol et, yoksa ekle
+                if (!extension.StartsWith("."))
+                {
+                    extension = "." + extension;
+                }
+
+                return mediaName + extension;
+            }
+        }
+
+        private async Task<bool> TransferSingleMedia(ExistingMediaModel record)
+        {
+            string fileName;
+
+            try
+            {
+                fileName = BuildFileName(record);
+            }
+            catch (ArgumentException ex)
+            {
+                Log(record.RowNumber, $"Invalid file name configuration: {ex.Message}");
+                return false;
+            }
+
+            Stream mediaStream = null;
+
+            if (record.media_url.StartsWith("data:") || (!record.media_url.StartsWith("http://") && !record.media_url.StartsWith("https://")))
+            {
+                // Base64 data
+                try
+                {
+                    string base64Data = record.media_url;
+                    if (base64Data.Contains(","))
+                    {
+                        base64Data = base64Data.Split(',')[1];
+                    }
+
+                    byte[] bytes = Convert.FromBase64String(base64Data);
+                    mediaStream = new MemoryStream(bytes);
+
+                    Log(record.RowNumber, $"Base64 data converted for: {fileName}");
+                }
+                catch (Exception ex)
+                {
+                    Log(record.RowNumber, $"Failed to convert base64 data for: {fileName} - {ex.Message}");
+                    return false;
+                }
+            }
+            else
+            {
+                // HTTP/HTTPS URL
+                try
+                {
+                    var response = await _httpClient.GetAsync(record.media_url);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        mediaStream = await response.Content.ReadAsStreamAsync();
+                        Log(record.RowNumber, $"Downloaded from URL: {fileName}");
+                    }
+                    else
+                    {
+                        Log(record.RowNumber, $"Failed to download from URL: {record.media_url} - Status: {response.StatusCode}");
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log(record.RowNumber, $"Error downloading from URL: {record.media_url} - {ex.Message}");
+                    return false;
+                }
+            }
+
+            if (mediaStream != null)
+            {
+                try
+                {
+                    if (currentProvider == StorageProvider.AwsS3)
+                    {
+                        var awsService = CreateAwsService();
+                        bool exists = await awsService.CheckIfFileExistsAsync(fileName);
+
+                        if (!exists)
+                        {
+                            await awsService.UploadFileAsync(fileName, mediaStream, _cancellationTokenSource.Token);
+                            Log(record.RowNumber, $"Uploaded to AWS: {fileName}");
+                            return true;
+                        }
+                        else
+                        {
+                            Log(record.RowNumber, $"Skipped (Exists) AWS: {fileName}");
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        var azureService = CreateAzureService();
+                        bool exists = await azureService.CheckIfBlobExistsAsync(fileName);
+
+                        if (!exists)
+                        {
+                            string contentType = GetContentTypeFromFileName(fileName);
+                            if (string.IsNullOrEmpty(contentType))
+                            {
+                                await azureService.UploadBlobAsync(fileName, mediaStream, null, _cancellationTokenSource.Token);
+                            }
+                            else
+                            {
+                                await azureService.UploadBlobWithContentTypeAsync(fileName, mediaStream, contentType, _cancellationTokenSource.Token);
+                            }
+                            Log(record.RowNumber, $"Uploaded to Azure: {fileName}");
+                            return true;
+                        }
+                        else
+                        {
+                            Log(record.RowNumber, $"Skipped (Exists) Azure: {fileName}");
+                            return false;
+                        }
+                    }
+                }
+                finally
+                {
+                    mediaStream?.Dispose();
+                }
+            }
+
+            return false;
+        }
+
+        private async Task TransferM3u8Media(ExistingMediaModel record)
+        {
+            Log(record.RowNumber, $"Starting M3U8 transfer for: {record.media_name}");
+
+            try
+            {
+                // Media name'den extension'ı çıkar (folder adı için)
+                string folderName = GetFileNameWithoutExtension(record.media_name);
+
+                // M3U8 klasörünü indir
+                var m3u8Files = await _m3u8Service.DownloadM3u8FolderAsync(record.m3u8_media_url, folderName);
+
+                Log(record.RowNumber, $"Downloaded {m3u8Files.Count} M3U8 files for: {record.media_name}");
+
+                // Her dosyayı upload et
+                foreach (var file in m3u8Files)
+                {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested)
+                        break;
+
+                    string fullPath = $"{folderName}/{file.RelativePath}";
+
+                    Stream fileStream = null;
+
+                    if (file.BinaryContent != null)
+                    {
+                        fileStream = new MemoryStream(file.BinaryContent);
+                    }
+                    else if (!string.IsNullOrEmpty(file.Content))
+                    {
+                        fileStream = new MemoryStream(Encoding.UTF8.GetBytes(file.Content));
+                    }
+
+                    if (fileStream != null)
+                    {
+                        try
+                        {
+                            if (currentProvider == StorageProvider.AwsS3)
+                            {
+                                var awsService = CreateAwsService();
+                                bool exists = await awsService.CheckIfFileExistsAsync(fullPath);
+
+                                if (!exists)
+                                {
+                                    await awsService.UploadFileAsync(fullPath, fileStream, _cancellationTokenSource.Token);
+                                    Log(record.RowNumber, $"Uploaded M3U8 to AWS: {fullPath}");
+                                }
+                            }
+                            else
+                            {
+                                var azureService = CreateAzureService();
+                                bool exists = await azureService.CheckIfBlobExistsAsync(fullPath);
+
+                                if (!exists)
+                                {
+                                    string contentType = GetContentTypeFromFileName(fullPath);
+                                    if (string.IsNullOrEmpty(contentType))
+                                    {
+                                        await azureService.UploadBlobAsync(fullPath, fileStream, null, _cancellationTokenSource.Token);
+                                    }
+                                    else
+                                    {
+                                        await azureService.UploadBlobWithContentTypeAsync(fullPath, fileStream, contentType, _cancellationTokenSource.Token);
+                                    }
+                                    Log(record.RowNumber, $"Uploaded M3U8 to Azure: {fullPath}");
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            fileStream?.Dispose();
+                        }
+                    }
+                }
+
+                Log(record.RowNumber, $"Completed M3U8 transfer for: {record.media_name}");
+            }
+            catch (Exception ex)
+            {
+                Log(record.RowNumber, $"Failed M3U8 transfer for: {record.media_name} - {ex.Message}");
+                throw;
+            }
+        }
+
+        private string GetFileNameWithoutExtension(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return fileName;
+
+            return Path.GetFileNameWithoutExtension(fileName);
         }
 
         private async Task TransferToAwsS3()
@@ -342,7 +705,7 @@ namespace MediaCloudUploaderFormApp
                             {
                                 if (!string.IsNullOrEmpty(colorCode))
                                 {
-                                    fileName = $"{stockCode}_{colorCode}_{mediaDirection}{fileExtension}";                                
+                                    fileName = $"{stockCode}_{colorCode}_{mediaDirection}{fileExtension}";
                                 }
                                 else
                                 {
@@ -404,6 +767,26 @@ namespace MediaCloudUploaderFormApp
                 failedCount > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
         }
 
+        private AwsS3StorageService CreateAwsService()
+        {
+            return new AwsS3StorageService(
+                txtAccessKey.Text,
+                txtSecretKey.Text,
+                txtRegion.Text,
+                txtBucketName.Text
+            );
+        }
+
+        private AzureBlobStorageService CreateAzureService()
+        {
+            return new AzureBlobStorageService(
+                txtAzureBlobUrl.Text,
+                txtAzureSasToken.Text,
+                txtAzureContainerName.Text,
+                txtAzureFolderPath.Text
+            );
+        }
+
         private string CleanString(string input)
         {
             if (string.IsNullOrEmpty(input))
@@ -449,6 +832,19 @@ namespace MediaCloudUploaderFormApp
 
         private void btnDownloadCsvTemplate_Click(object sender, EventArgs e)
         {
+            string template = "";
+
+            if (currentTransferMode == DataTransferMode.CreateWithNewList)
+            {
+                template = Properties.Resources.template;
+            }
+            else
+            {
+                template = "media_name,media_extension,media_url,is_converted_m3u8,m3u8_media_url\n" +
+                          "example_media,jpg,https://example.com/image.jpg,false,\n" +
+                          "example_video,mp4,data:video/mp4;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==,true,https://example.com/video/video.m3u8";
+            }
+
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
                 saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
@@ -459,8 +855,7 @@ namespace MediaCloudUploaderFormApp
                 {
                     try
                     {
-                        byte[] fileContent = Encoding.UTF8.GetBytes(Properties.Resources.template);
-
+                        byte[] fileContent = Encoding.UTF8.GetBytes(template);
                         File.WriteAllBytes(saveFileDialog.FileName, fileContent);
 
                         MessageBox.Show("Template file saved successfully!", "Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -718,6 +1113,10 @@ namespace MediaCloudUploaderFormApp
                     return "video/quicktime";
                 case ".pdf":
                     return "application/pdf";
+                case ".m3u8":
+                    return "application/vnd.apple.mpegurl";
+                case ".ts":
+                    return "video/mp2t";
                 default:
                     return "application/octet-stream";
             }

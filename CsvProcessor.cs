@@ -23,7 +23,7 @@ namespace MediaCloudUploaderFormApp
                     media_url = r.media_url,
                     erp_colorCode = erpColorCode,
                     integration_colorCode = integrationColorCode,
-                    color_code = !string.IsNullOrEmpty(erpColorCode) ? erpColorCode : !string.IsNullOrEmpty(integrationColorCode) ? integrationColorCode : null,
+                    color_code = !string.IsNullOrEmpty(integrationColorCode) ? integrationColorCode : !string.IsNullOrEmpty(erpColorCode) ? erpColorCode : null,
                     IsLatestRecord = false
                 };
             }).ToList();
@@ -47,6 +47,56 @@ namespace MediaCloudUploaderFormApp
             }
 
             return processedRecords;
+        }
+
+        public static List<ExistingMediaModel> ProcessCsvRecordsToExistingMedias(IEnumerable<dynamic> records)
+        {
+            var processedRecords = records.Select((r, index) =>
+            {
+                return new ExistingMediaModel
+                {
+                    RowNumber = index + 1,
+                    media_name = r.media_name?.ToString() ?? "",
+                    media_extension = r.media_extension?.ToString() ?? "",
+                    media_url = r.media_url?.ToString() ?? "",
+                    is_converted_m3u8 = ParseBooleanValue(r.is_converted_m3u8?.ToString()),
+                    m3u8_media_url = r.m3u8_media_url?.ToString() ?? ""
+                };
+            }).ToList();
+
+            return processedRecords;
+        }
+
+        private static bool ParseBooleanValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+
+            string cleanValue = value.Trim().ToLower();
+
+            switch (cleanValue)
+            {
+                case "true":
+                case "1":
+                case "yes":
+                case "y":
+                case "DOĞRU":
+                case "doğru":
+                    return true;
+                case "false":
+                case "yanlış":
+                case "YANLIŞ":
+                case "0":
+                case "no":
+                case "n":
+                case "":
+                    return false;
+                default:
+                    if (bool.TryParse(cleanValue, out bool result))
+                        return result;
+
+                    return false;
+            }
         }
 
         public static List<CsvRecordModel> GetLatestRecords(this IEnumerable<CsvRecordModel> records)

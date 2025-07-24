@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using System;
 using System.IO;
@@ -78,6 +79,10 @@ namespace MediaCloudUploaderFormApp
 
             BlobUploadOptions options = new BlobUploadOptions
             {
+                Conditions = new BlobRequestConditions
+                {
+                    IfNoneMatch = ETag.All // Sadece dosya yoksa upload et
+                },
                 ProgressHandler = new Progress<long>(bytesTransferred =>
                 {
                     progressHandler?.Invoke(bytesTransferred);
@@ -99,6 +104,10 @@ namespace MediaCloudUploaderFormApp
 
             BlobUploadOptions options = new BlobUploadOptions
             {
+                Conditions = new BlobRequestConditions
+                {
+                    IfNoneMatch = ETag.All // Sadece dosya yoksa upload et
+                },
                 HttpHeaders = new BlobHttpHeaders
                 {
                     ContentType = contentType
